@@ -1,0 +1,79 @@
+name: tarraco-parkings
+
+services:
+  db:
+    image: mariadb:10.11
+    container_name: tarraco-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      TZ: ${APP_TIMEZONE}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    networks:
+      - tarraco
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: tarraco-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: ${APP_ENV}
+      APP_URL: ${APP_URL}
+      APP_TIMEZONE: ${APP_TIMEZONE}
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - ./certs:/etc/apache2/certs
+    networks:
+      - tarraco
+
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    container_name: tarraco-phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 64M
+      TZ: ${APP_TIMEZONE}
+    ports:
+      - "${PMA_PORT:-8080}:80"
+    networks:
+      - tarraco
+
+volumes:
+  db_data:
+    name: tarraco-parkings-db
+
+networks:
+  tarraco:
+    name: tarraco-parkings_tarraco
+    driver: bridge

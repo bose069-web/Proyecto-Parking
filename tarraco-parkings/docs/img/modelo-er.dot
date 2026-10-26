@@ -1,0 +1,70 @@
+digraph MODELO {
+  graph [rankdir=LR, splines=true, nodesep=0.45, ranksep=1.15,
+         fontname="Helvetica", bgcolor="transparent", pad=0.25];
+  node [shape=plaintext, fontname="Helvetica", fontsize=9];
+  edge [fontname="Helvetica", fontsize=8, color="#40566E",
+        fontcolor="#40566E", arrowsize=0.7, penwidth=1.1];
+  CLIENTE [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="9" COLOR="#2C3E50" BGCOLOR="#E8F1FB">
+      <TR><TD><FONT POINT-SIZE="11"><B>CLIENTE</B></FONT></TD></TR>
+    </TABLE>>];
+  VEHICULO [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="9" COLOR="#2C3E50" BGCOLOR="#F7F9FC">
+      <TR><TD><FONT POINT-SIZE="11"><B>VEHICULO</B></FONT></TD></TR>
+    </TABLE>>];
+  METODO_PAGO [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="9" COLOR="#2C3E50" BGCOLOR="#F7F9FC">
+      <TR><TD><FONT POINT-SIZE="11"><B>METODO_PAGO</B></FONT></TD></TR>
+    </TABLE>>];
+  PARKING [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="9" COLOR="#2C3E50" BGCOLOR="#EAF4F0">
+      <TR><TD><FONT POINT-SIZE="11"><B>PARKING</B></FONT></TD></TR>
+    </TABLE>>];
+  PLAZA [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="9" COLOR="#2C3E50" BGCOLOR="#F7F9FC">
+      <TR><TD><FONT POINT-SIZE="11"><B>PLAZA</B></FONT></TD></TR>
+    </TABLE>>];
+  TARIFA [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="9" COLOR="#2C3E50" BGCOLOR="#F7F9FC">
+      <TR><TD><FONT POINT-SIZE="11"><B>TARIFA</B></FONT></TD></TR>
+    </TABLE>>];
+  RESERVA [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="9" COLOR="#2C3E50" BGCOLOR="#FFF3E0">
+      <TR><TD><FONT POINT-SIZE="11"><B>RESERVA</B></FONT></TD></TR>
+    </TABLE>>];
+  PAGO [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="9" COLOR="#2C3E50" BGCOLOR="#F7F9FC">
+      <TR><TD><FONT POINT-SIZE="11"><B>PAGO</B></FONT></TD></TR>
+    </TABLE>>];
+  REGISTRO_ACCESO [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="9" COLOR="#2C3E50" BGCOLOR="#F7F9FC">
+      <TR><TD><FONT POINT-SIZE="11"><B>REGISTRO_ACCESO</B></FONT></TD></TR>
+    </TABLE>>];
+  ADMINISTRADOR [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="9" COLOR="#2C3E50" BGCOLOR="#F3EEF8">
+      <TR><TD><FONT POINT-SIZE="11"><B>ADMINISTRADOR</B></FONT></TD></TR>
+    </TABLE>>];
+  REGISTRO_AUDITORIA [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="9" COLOR="#2C3E50" BGCOLOR="#F7F9FC">
+      <TR><TD><FONT POINT-SIZE="11"><B>REGISTRO_AUDITORIA</B></FONT></TD></TR>
+    </TABLE>>];
+  CLIENTE -> VEHICULO [label="tiene\n1 : 0..*"];
+  CLIENTE -> METODO_PAGO [label="registra\n1 : 0..*"];
+  CLIENTE -> RESERVA [label="realiza\n1 : 0..*"];
+  VEHICULO -> RESERVA [label="se reserva en\n1 : 0..*"];
+  PARKING -> PLAZA [label="contiene\n1 : 0..*"];
+  PARKING -> TARIFA [label="aplica\n1 : 0..*"];
+  PARKING -> RESERVA [label="recibe\n1 : 0..*"];
+  PLAZA -> RESERVA [label="se asigna a\n0..1 : 0..*"];
+  TARIFA -> RESERVA [label="valoriza\n1 : 0..*"];
+  RESERVA -> PAGO [label="genera\n1 : 1..*"];
+  METODO_PAGO -> PAGO [label="cobra con\n1 : 0..*"];
+  RESERVA -> REGISTRO_ACCESO [label="origina\n0..1 : 0..*"];
+  VEHICULO -> REGISTRO_ACCESO [label="protagoniza\n0..1 : 0..*"];
+  PARKING -> REGISTRO_ACCESO [label="ocurre en\n1 : 0..*"];
+  ADMINISTRADOR -> REGISTRO_AUDITORIA [label="ejecuta\n0..1 : 0..*"];
+  { rank=same; CLIENTE; PARKING; ADMINISTRADOR; }
+  { rank=same; VEHICULO; METODO_PAGO; PLAZA; TARIFA; }
+  { rank=same; RESERVA; }
+  { rank=same; PAGO; REGISTRO_ACCESO; REGISTRO_AUDITORIA; }
+}

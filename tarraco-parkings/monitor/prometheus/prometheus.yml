@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    proyecto: tarraco-parkings
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: node-exporter
+    static_configs:
+      - targets: ["node-exporter:9100"]
+
+  - job_name: cadvisor
+    static_configs:
+      - targets: ["cadvisor:8080"]
+
+  # La aplicación solo habla HTTPS; Prometheus acepta el certificado autofirmado.
+  - job_name: tarraco-app
+    scheme: https
+    metrics_path: /metrics.php
+    tls_config:
+      insecure_skip_verify: true
+    static_configs:
+      - targets: ["app:443"]
