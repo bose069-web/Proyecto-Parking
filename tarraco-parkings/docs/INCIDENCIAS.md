@@ -5,7 +5,7 @@ construcción y las pruebas del Sprint 2, con el síntoma, la causa y la
 solución aplicada. No es una lista de buenas prácticas: son cosas que
 fallaron de verdad y que costaron tiempo.
 
-**Fechas de las pruebas:** 21 y 23 de octubre de 2026.
+**Fechas de las pruebas:** 21, 23, 28 y 29 de octubre de 2026.
 **Entorno:** VM Ubuntu 24.04.5 con Docker Compose, y el portátil como cliente
 por el puerto reenviado 8443.
 
@@ -207,6 +207,26 @@ por el puerto reenviado 8443.
 | **Solución** | Una función `plural()` y su uso en todos los contadores de la interfaz: plazas, reservas, clientes, recintos, registros. |
 | **Dónde** | `app/src/bootstrap.php` y las vistas |
 
+### 1.22 El cobro de una reserva de ejemplo era el doble de su total
+
+| | |
+|---|---|
+| **Síntoma** | Ninguno visible: el smoke test daba 18/18 y los totales de todas las reservas cuadraban con su tarifa. El error solo aparecía al sumar los ingresos, que salían 7,92 € por encima. |
+| **Causa** | En los datos de ejemplo, el `PAGO` de la reserva 2 tenía 15,84 € cuando el `importe_total` de esa reserva era 7,92 €. Los dos valores se habían escrito a mano en sitios distintos de `db/init.sql`. El smoke test comparaba cada reserva con su tarifa, pero nunca cruzaba `PAGO` con `RESERVA`. |
+| **Solución** | Se corrigió el importe y se añadió una comprobación al smoke test que cruza las dos tablas: «cada cobro de reserva coincide con su importe total». Con el dato antiguo, esa prueba falla. |
+| **Prevención** | El smoke test pasa de 18 a 19 comprobaciones. |
+| **Dónde** | `db/init.sql`, `scripts/smoke-test.sh` |
+
+### 1.23 Faltaban dos requisitos del enunciado: resguardo PDF y condiciones
+
+| | |
+|---|---|
+| **Síntoma** | La aplicación funcionaba, pero no generaba el PDF de la reserva ni pedía aceptar las condiciones antes de confirmar. Las dos cosas están en las especificaciones funcionales del proyecto. |
+| **Causa** | No estaban en la lista de tareas del sprint. Se detectaron al leer el enunciado de Moodle completo, ya con la aplicación construida. |
+| **Solución** | Se añadieron como tareas 6.2 y 6.3. El resguardo se genera en `reservation-pdf.php` con una clase `Pdf` propia, porque el contenedor no tiene librería de PDF ni red para instalarla. La aceptación de condiciones se comprueba en `Reservation::crear()` y se guarda con marca de tiempo en `RESERVA.condiciones_aceptadas`; el texto vive en `/condiciones.php`. |
+| **Prevención** | La prueba de extremo a extremo comprueba tres cosas nuevas: que sin la casilla no se crea la reserva, que el PDF se descarga y que lleva el código. Pasa de 50 a 53 comprobaciones. |
+| **Dónde** | `app/public/reservation-pdf.php`, `app/src/Pdf.php`, `app/public/condiciones.php`, `db/init.sql` |
+
 ## 2. Incidencias del entorno de pruebas
 
 ### 2.1 La instalación desatendida de Ubuntu Server no se aplicaba
@@ -282,12 +302,12 @@ precisión.
 
 | Prueba | Dónde | Resultado |
 |---|---|---|
-| `scripts/smoke-test.sh` | Dentro de la VM | **18/18** |
-| `tests/e2e_client.py` | Portátil → VM por HTTPS (8443) | **50/50**, varias pasadas seguidas |
+| `scripts/smoke-test.sh` | Dentro de la VM | **19/19** |
+| `tests/e2e_client.py` | Portátil → VM por HTTPS (8443) | **53/53**, varias pasadas seguidas |
 | `tests/pricing_test.php` | Sin base de datos | **22/22** |
 | `tests/check_schema.py` | Sobre `db/init.sql` | 11 tablas, 15 FK, sin errores |
-| `tests/check_sql_params.php` | Sobre `app/src/*.php` | 96 consultas, sin marcadores huérfanos |
-| `tests/check_links.py` | Sobre la app y la documentación | 85 referencias, todas resuelven |
+| `tests/check_sql_params.php` | Sobre `app/src/*.php` | 99 consultas, sin marcadores huérfanos |
+| `tests/check_links.py` | Sobre la app y la documentación | 96 referencias, todas resuelven |
 
 **La prueba de extremo a extremo es la que demuestra el lado cliente.** Se
 ejecuta desde el portátil, no desde la VM, y contra `https://<vm>:8443`. Cubre
@@ -309,7 +329,7 @@ comprobar una corrección. Ahora se puede repetir.
 pasarela de pago real (está simulada a propósito) y el comportamiento con dos
 máquinas en redes separadas.
 
-**Las capturas.** Las dieciséis de `docs/img/` son el framebuffer de la VM y se
+**Las capturas.** Las veintidós de `docs/img/` son el framebuffer de la VM y se
 han revisado una a una contra la imagen. La del panel de Grafana se tomó con el
 panel aprovisionado y datos reales, y la de Prometheus con los cuatro objetivos
 en `UP`. Una captura de la pantalla de acceso no demuestra monitorización, así

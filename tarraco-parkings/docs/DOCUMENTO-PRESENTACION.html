@@ -1,0 +1,1106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Tarraco Parkings · Sprint 2 · Documento de presentación</title>
+<link rel="stylesheet" href="documento.css">
+</head>
+<body>
+
+<!-- ===================== PORTADA ===================== -->
+<div class="cover">
+  <div>
+    <div class="cover-institution"><strong>Institut Vidal i Barraquer</strong> &nbsp;·&nbsp; ASIX2 0379</div>
+    <h1>Tarraco Parkings<br>Sprint 2</h1>
+    <div class="cover-rule"></div>
+    <h2>Implementación, despliegue y verificación de la aplicación de reserva de plazas<br>
+        Proyecto 1 &nbsp;·&nbsp; FASE 1 &nbsp;·&nbsp; Grupo 6</h2>
+  </div>
+
+  <dl class="cover-meta">
+    <div><dt>Asignatura</dt><dd>Proyecto de administración de sistemas informáticos en red</dd></div>
+    <div><dt>Grupo</dt><dd>Grupo 6</dd></div>
+    <div><dt>Entrega</dt><dd>SPRINT 2 (Implementación) · 22/11/2026</dd></div>
+  </dl>
+
+  <dl class="cover-meta">
+    <div><dt>Arquitecto / analista</dt><dd>Pere Brau Martínez (PB)</dd></div>
+    <div><dt>Analista / equipamiento</dt><dd>Mehta, Dhruva Pankajkumar (DM)</dd></div>
+    <div><dt>Coordinador / ejecutor</dt><dd>Seck, Boubacar (BS)</dd></div>
+  </dl>
+
+  <div class="cover-foot">
+    <span>Documento de presentación del Sprint 2</span>
+    <span>Curso 2026-2027</span>
+  </div>
+</div>
+
+<!-- ===================== ÍNDICE ===================== -->
+<div class="toc">
+  <h2>Índice</h2>
+  <ol>
+    <li><a href="#s1"><span class="num">1</span>Qué se entrega y qué no<span class="pg" data-ref="s1">3</span></a>
+      <ol>
+        <li><a href="#s11"><span class="num">1.1</span>Resumen del sprint<span class="pg" data-ref="s11">3</span></a></li>
+        <li><a href="#s12"><span class="num">1.2</span>Alcance: solo software<span class="pg" data-ref="s12">3</span></a></li>
+        <li><a href="#s13"><span class="num">1.3</span>Las dos indicaciones del profesorado<span class="pg" data-ref="s13">3</span></a></li>
+      </ol>
+    </li>
+    <li><a href="#s2"><span class="num">2</span>Cómo funciona la aplicación<span class="pg" data-ref="s2">4</span></a>
+      <ol>
+        <li><a href="#s21"><span class="num">2.1</span>Los tres roles<span class="pg" data-ref="s21">4</span></a></li>
+        <li><a href="#s22"><span class="num">2.2</span>El recorrido del cliente<span class="pg" data-ref="s22">4</span></a></li>
+        <li><a href="#s23"><span class="num">2.3</span>El recorrido del administrador<span class="pg" data-ref="s23">5</span></a></li>
+        <li><a href="#s24"><span class="num">2.4</span>El operador y el reparto de permisos<span class="pg" data-ref="s24">6</span></a></li>
+      </ol>
+    </li>
+    <li><a href="#s3"><span class="num">3</span>Arquitectura, servicios y servidor<span class="pg" data-ref="s3">7</span></a>
+      <ol>
+        <li><a href="#s31"><span class="num">3.1</span>Los siete contenedores<span class="pg" data-ref="s31">7</span></a></li>
+        <li><a href="#s32"><span class="num">3.2</span>El servidor de despliegue<span class="pg" data-ref="s32">8</span></a></li>
+        <li><a href="#s33"><span class="num">3.3</span>HTTPS y certificados<span class="pg" data-ref="s33">8</span></a></li>
+        <li><a href="#s34"><span class="num">3.4</span>Copias de seguridad y restauración<span class="pg" data-ref="s34">9</span></a></li>
+        <li><a href="#s35"><span class="num">3.5</span>Monitorización<span class="pg" data-ref="s35">9</span></a></li>
+      </ol>
+    </li>
+    <li><a href="#s4"><span class="num">4</span>Modelo de datos<span class="pg" data-ref="s4">11</span></a>
+      <ol>
+        <li><a href="#s41"><span class="num">4.1</span>Las once entidades<span class="pg" data-ref="s41">11</span></a></li>
+        <li><a href="#s42"><span class="num">4.2</span>Las quince relaciones<span class="pg" data-ref="s42">11</span></a></li>
+        <li><a href="#s43"><span class="num">4.3</span>Diagrama E/R actualizado<span class="pg" data-ref="s43">12</span></a></li>
+        <li><a href="#s44"><span class="num">4.4</span>Integridad en la base de datos<span class="pg" data-ref="s44">12</span></a></li>
+        <li><a href="#s45"><span class="num">4.5</span>Qué cambia respecto al Sprint 1<span class="pg" data-ref="s45">13</span></a></li>
+      </ol>
+    </li>
+    <li><a href="#s5"><span class="num">5</span>Implementación y código<span class="pg" data-ref="s5">14</span></a>
+      <ol>
+        <li><a href="#s51"><span class="num">5.1</span>Estructura del código<span class="pg" data-ref="s51">14</span></a></li>
+        <li><a href="#s52"><span class="num">5.2</span>La reserva en una transacción<span class="pg" data-ref="s52">14</span></a></li>
+        <li><a href="#s53"><span class="num">5.3</span>El precio y el exceso<span class="pg" data-ref="s53">15</span></a></li>
+        <li><a href="#s54"><span class="num">5.4</span>El control de acceso<span class="pg" data-ref="s54">15</span></a></li>
+        <li><a href="#s55"><span class="num">5.5</span>El resguardo PDF<span class="pg" data-ref="s55">16</span></a></li>
+        <li><a href="#s56"><span class="num">5.6</span>Seguridad<span class="pg" data-ref="s56">17</span></a></li>
+      </ol>
+    </li>
+    <li><a href="#s6"><span class="num">6</span>Planificación actualizada<span class="pg" data-ref="s6">19</span></a>
+      <ol>
+        <li><a href="#s61"><span class="num">6.1</span>Método y herramienta<span class="pg" data-ref="s61">19</span></a></li>
+        <li><a href="#s62"><span class="num">6.2</span>Tareas y reparto de roles<span class="pg" data-ref="s62">19</span></a></li>
+        <li><a href="#s63"><span class="num">6.3</span>Diagrama de Gantt<span class="pg" data-ref="s63">20</span></a></li>
+        <li><a href="#s64"><span class="num">6.4</span>Qué se desvió y por qué<span class="pg" data-ref="s64">21</span></a></li>
+      </ol>
+    </li>
+    <li><a href="#s7"><span class="num">7</span>Verificación<span class="pg" data-ref="s7">22</span></a>
+      <ol>
+        <li><a href="#s71"><span class="num">7.1</span>Qué se ejecutó y qué devolvió<span class="pg" data-ref="s71">22</span></a></li>
+        <li><a href="#s72"><span class="num">7.2</span>El enunciado, punto por punto<span class="pg" data-ref="s72">22</span></a></li>
+        <li><a href="#s73"><span class="num">7.3</span>Límites conocidos<span class="pg" data-ref="s73">24</span></a></li>
+      </ol>
+    </li>
+    <li><a href="#s8"><span class="num">8</span>Bibliografía<span class="pg" data-ref="s8">25</span></a></li>
+    <li><a href="#s9"><span class="num">9</span>Declaración de uso de IA<span class="pg" data-ref="s9">27</span></a></li>
+    <li><a href="#sa"><span class="num">A</span>Anexo A. Capturas de la aplicación<span class="pg" data-ref="sa">30</span></a></li>
+    <li><a href="#sb"><span class="num">B</span>Anexo B. Guion de la exposición<span class="pg" data-ref="sb">31</span></a></li>
+  </ol>
+</div>
+
+<!-- ===================== 1 ===================== -->
+<h1 class="section" id="s1">1. Qué se entrega y qué no</h1>
+
+<h2 id="s11">1.1 Resumen del sprint</h2>
+<p>El Sprint 1 dejó el diseño: casos de uso, modelo entidad/relación y plan. El Sprint 2 entrega
+la aplicación funcionando, desplegada con Docker y probada contra una base de datos real. Hoy se
+puede abrir una web con HTTPS donde un cliente se registra, da de alta su vehículo, reserva,
+descarga el resguardo y entra y sale con la matrícula. La entrega tiene seis piezas, y cada una
+se comprueba por separado:</p>
+
+<table class="data">
+  <thead><tr><th style="width:27%">Pieza</th><th>Dónde está</th><th style="width:23%">Cómo se comprueba</th></tr></thead>
+  <tbody>
+    <tr><td>Aplicación web en marcha</td><td><code>docker compose up -d</code> sobre el repositorio</td><td><code>https://localhost</code></td></tr>
+    <tr><td>Código fuente comentado</td><td><code>tarraco-parkings/</code>, 37 archivos PHP en <code>app/</code></td><td><code>php -l</code>, sin errores</td></tr>
+    <tr><td>Base de datos y modelo E/R</td><td><code>db/init.sql</code>, 11 tablas y datos de ejemplo; <code>docs/MODELO_LOGICO.md</code></td><td><code>tests/check_schema.py</code></td></tr>
+    <tr><td>Documentación técnica</td><td><code>docs/MANUAL_TECNICO.md</code>, <code>docs/MODELO_LOGICO.md</code>, <code>docs/INCIDENCIAS.md</code></td><td>lectura y <code>tests/check_links.py</code></td></tr>
+    <tr><td>Manual de usuario</td><td><code>docs/MANUAL_USUARIO.md</code></td><td>lectura y recorrido con las capturas</td></tr>
+    <tr><td>Presentación y vídeo</td><td><code>docs/PRESENTACION.pptx</code>, <code>docs/VIDEO-DEMO.mp4</code></td><td>reproducción</td></tr>
+  </tbody>
+</table>
+
+<p>Este documento une las seis piezas: qué hace el sistema, cómo está montado y qué se ha
+probado. Los manuales técnico y de usuario van aparte.</p>
+
+<h2 id="s12">1.2 Alcance: solo software</h2>
+<p>La aplicación gestiona reservas, cobros simulados y control de acceso simulado. No hay
+lectores de matrícula, ni barreras, ni red de los aparcamientos: el acceso se teclea en un
+formulario con sesión y el sistema decide, dejando traza. Quedan fuera del alcance la pasarela
+de pago real, el correo y la aplicación móvil.</p>
+
+<h2 id="s13">1.3 Las dos indicaciones del profesorado</h2>
+<p>Después de la exposición del Sprint 1, el profesorado hizo dos indicaciones que aquí se
+adoptan como requisitos por encima de la guía interna. La primera: retirar todo el hardware, sin
+controlar equipos ni red de los parkings. La segunda: enseñar las conexiones entidad/relación
+dentro de la planificación, no solo el modelo relacional.</p>
+
+<p>Las dos se cumplen. <code>DISPOSITIVO</code> desaparece, <code>REGISTRO_ACCESO</code> pierde la
+referencia al equipo y la barrera, y no hay diagramas de red ni de racks. El modelo lógico
+completo, con cardinalidades, está en el apartado 4 y en <code>docs/MODELO_LOGICO.md</code>.</p>
+
+<!-- ===================== 2 ===================== -->
+<h1 class="section" id="s2">2. Cómo funciona la aplicación</h1>
+
+<h2 id="s21">2.1 Los tres roles</h2>
+<p>Hay tres formas de entrar al sistema y cada una ve cosas distintas. No son etiquetas: son
+sesiones separadas y permisos comprobados en el servidor, no en el menú.</p>
+
+<table class="data">
+  <thead><tr><th style="width:16%">Rol</th><th style="width:26%">Dónde entra</th><th>Qué puede hacer</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><b>Cliente</b></td>
+      <td><code>/login.php</code></td>
+      <td>Registrarse, gestionar sus datos y sus vehículos, reservar, descargar el resguardo,
+          cancelar antes de empezar y mover sus matrículas en el control de acceso.</td>
+    </tr>
+    <tr>
+      <td><b>Administrador</b></td>
+      <td><code>/admin/login.php</code></td>
+      <td>Ver y filtrar todas las reservas, modificarlas y cancelarlas, crear parkings con sus
+          plazas y tarifas, retirar plazas, activar o desactivar clientes y consultar la auditoría.</td>
+    </tr>
+    <tr>
+      <td><b>Operador</b></td>
+      <td><code>/admin/login.php</code></td>
+      <td>Consulta reservas, clientes y auditoría. No modifica nada: aunque fabrique el POST a mano,
+          <code>requireRole()</code> lo rechaza en el servidor y la acción no se ejecuta.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>El rol vive en la tabla <code>ADMINISTRADOR</code>, en la columna <code>rol</code>, con tres
+valores: <code>SUPERADMIN</code>, <code>ADMIN</code> y <code>OPERADOR</code>. La comprobación la
+hace <code>Auth::requireRole()</code> al principio de cada página de escritura, así que no
+depende de que el enlace esté escondido.</p>
+
+<h2 id="s22">2.2 El recorrido del cliente</h2>
+<p>El cliente hace siete pasos y cada uno deja un rastro en la base de datos. Este es el
+recorrido que se enseña en la exposición y el que graba el vídeo.</p>
+
+<ol>
+  <li><b>Se registra.</b> Nombre, apellidos, correo, documento y contraseña. En la misma
+      transacción se le crea un método de pago simulado, porque sin método no se puede reservar.</li>
+  <li><b>Da de alta el vehículo.</b> Matrícula, tipo, marca y modelo. La matrícula se normaliza a
+      mayúsculas y solo puede pertenecer a un cliente.</li>
+  <li><b>Elige parking y franja.</b> La pantalla muestra las plazas libres de cada parking y el
+      precio se recalcula en el momento al mover las fechas.</li>
+  <li><b>Acepta las condiciones.</b> La casilla es obligatoria y deja marca de tiempo en la
+      reserva. Sin ella, el sistema no crea nada.</li>
+  <li><b>Confirma y paga.</b> El pago es simulado y se confirma en el acto. La reserva nace
+      <code>ACTIVA</code> con una plaza asignada.</li>
+  <li><b>Descarga el resguardo.</b> Un PDF con el código de reserva, la plaza, la franja y el
+      importe. Es lo que se enseña en el acceso.</li>
+  <li><b>Entra y sale.</b> Teclea la matrícula en el control de acceso. La entrada se autoriza
+      dentro de la franja; la salida, si está en curso. Si se retrasa, se le cobra el exceso.</li>
+</ol>
+
+<div class="shots">
+  <figure><img src="img/captura-01-portada.png" alt="Portada con los tres parkings">
+    <figcaption><b>1.</b> Portada pública: los tres parkings, su horario y las plazas libres.</figcaption></figure>
+  <figure><img src="img/captura-08-precio-calculado.png" alt="Precio calculado antes de confirmar">
+    <figcaption><b>2.</b> El precio se calcula antes de confirmar: 3 h a 1,80 € más el 10 % de gestión.</figcaption></figure>
+  <figure><img src="img/captura-21-formulario-condiciones.png" alt="Casilla de condiciones aceptada">
+    <figcaption><b>3.</b> La casilla de condiciones es obligatoria; se comprueba también en el servidor.</figcaption></figure>
+  <figure><img src="img/captura-22-resguardo-pdf.png" alt="Resguardo de la reserva en PDF">
+    <figcaption><b>4.</b> Resguardo PDF generado por la aplicación con los datos reales de la reserva.</figcaption></figure>
+</div>
+
+<h2 id="s23">2.3 El recorrido del administrador</h2>
+<p>El administrador entra por una puerta distinta, <code>/admin/login.php</code>, y una sesión de
+cliente no le sirve para nada. Su panel resume el día: reservas activas, entradas previstas,
+clientes activos e ingresos confirmados.</p>
+
+<p>Desde ahí puede crear un parking pidiendo solo el precio por hora. El alta genera en una
+transacción el parking, sus plazas y su tarifa general, de modo que el parking nuevo se puede
+reservar al instante. Antes del 23 de octubre nacía con capacidad y sin plazas, y por eso
+aparecía con «0 libres»: quedó corregido y con prueba que lo cubre.</p>
+
+<p>En reservas puede filtrar por estado, parking o texto, modificar fechas y plaza, y cancelar
+con reembolso. No hay ninguna opción de borrar, y no es un descuido de la interfaz: la base de
+datos rechaza un <code>DELETE</code> sobre <code>RESERVA</code> aunque se intente desde fuera de
+la aplicación.</p>
+
+<div class="shots">
+  <figure><img src="img/captura-12-panel-admin.png" alt="Panel del administrador">
+    <figcaption><b>5.</b> Panel de administración con los indicadores del día y los tres parkings.</figcaption></figure>
+  <figure><img src="img/captura-13-reservas-admin.png" alt="Listado de reservas del administrador">
+    <figcaption><b>6.</b> Reservas: filtros, edición y cancelación. Nunca borrado.</figcaption></figure>
+</div>
+
+<h2 id="s24">2.4 El operador y el reparto de permisos</h2>
+<p>El operador existe para demostrar que la autorización no es binaria. Es el rol que consulta
+sin tocar: ve las reservas y la auditoría, y si intenta cancelar o modificar un parking se le
+rechaza la acción y vuelve al panel con un aviso, sin que nada cambie en la base de datos. La
+comprobación está en el servidor, en <code>requireRole()</code>, y no en el HTML.</p>
+
+<p>Lo que el operador no tiene es una pantalla propia. Comparte la del administrador con menos
+botones. Es una decisión consciente: el enunciado pide «gestión por parte de los
+administradores y otros roles», y un rol de solo lectura cumple esa frase sin multiplicar
+páginas que luego nadie usa.</p>
+
+<div class="note info">
+  <b>Por qué el control de acceso pide sesión.</b> El simulador escribe en <code>RESERVA</code>,
+  <code>PLAZA</code> y <code>PAGO</code>. Abierto a cualquiera permitía forzar entradas y cobros
+  sobre reservas ajenas. Ahora un cliente solo mueve sus matrículas y el administrador, cualquiera.
+</div>
+
+<!-- ===================== 3 ===================== -->
+<h1 class="section" id="s3">3. Arquitectura, servicios y servidor</h1>
+
+<h2 id="s31">3.1 Los siete contenedores</h2>
+<p>Todo el sistema se levanta con un comando y no hace falta instalar PHP, MariaDB ni nada más
+en la máquina. Son siete contenedores repartidos en dos ficheros de Docker Compose: el stack de
+la aplicación y el de monitorización.</p>
+
+<table class="data">
+  <thead><tr><th style="width:24%">Contenedor</th><th style="width:24%">Imagen</th><th style="width:14%">Puerto</th><th>Función</th></tr></thead>
+  <tbody>
+    <tr><td><code>tarraco-app</code></td><td>php:8.2-apache</td><td>80, 443</td><td>Aplicación PHP y métricas</td></tr>
+    <tr><td><code>tarraco-db</code></td><td>mariadb:10.11</td><td>interno 3306</td><td>Base de datos</td></tr>
+    <tr><td><code>tarraco-phpmyadmin</code></td><td>phpmyadmin:5.2</td><td>8080</td><td>Administración de la base</td></tr>
+    <tr><td><code>tarraco-prometheus</code></td><td>prom/prometheus</td><td>9090</td><td>Recogida de métricas</td></tr>
+    <tr><td><code>tarraco-grafana</code></td><td>grafana/grafana 11.2</td><td>3000</td><td>Paneles</td></tr>
+    <tr><td><code>tarraco-node-exporter</code></td><td>prom/node-exporter</td><td>9100</td><td>Métricas del servidor</td></tr>
+    <tr><td><code>tarraco-cadvisor</code></td><td>gcr.io/cadvisor</td><td>8082</td><td>Métricas de los contenedores</td></tr>
+  </tbody>
+</table>
+
+<p>La aplicación se construye sobre <code>php:8.2-apache</code> con <code>pdo_mysql</code>,
+<code>mbstring</code> y los módulos de reescritura, cabeceras y SSL. El único directorio que
+Apache sirve es <code>public/</code>; <code>config/</code>, <code>src/</code> y
+<code>templates/</code> quedan fuera por la directiva del VirtualHost.</p>
+
+<figure>
+  <img src="img/captura-14-grafana.png" alt="Panel de Grafana con datos reales" style="width:100%;border:.25mm solid var(--line);">
+  <figcaption><b>Figura 3.1.</b> Grafana con datos reales de la aplicación: reservas activas,
+  ingresos, errores 5xx, peticiones por clase y plazas libres por parking.</figcaption>
+</figure>
+
+<h2 id="s32">3.2 El servidor de despliegue</h2>
+<p>El sistema se ha probado en una máquina virtual Ubuntu 24.04.5 con 4 vCPU y 8 GB de memoria,
+con el proyecto en <code>/opt/tarraco-parkings</code>. No es un servidor de producción: es el
+entorno de demostración, y decir cuál es importa para que las cifras del apartado 7 se puedan
+repetir.</p>
+
+<dl class="ficha">
+  <dt>Máquina</dt><dd><code>sprint2-ubuntu</code>, Ubuntu 24.04.5, 4 vCPU, 8 GB</dd>
+  <dt>Docker</dt><dd>29.1 con Compose v2</dd>
+  <dt>Despliegue</dt><dd><code>/opt/tarraco-parkings</code>, <code>docker compose up -d --build</code></dd>
+  <dt>Acceso desde el portátil</dt><dd><code>https://127.0.0.1:8443</code>, puerto reenviado de la VM</dd>
+  <dt>Base de datos</dt><dd>MariaDB 10.11, base <code>tarraco_parkings</code>, 11 tablas</dd>
+  <dt>Administración de la base</dt><dd>phpMyAdmin en el 8081 del anfitrión (8080 dentro)</dd>
+</dl>
+
+<p>Los puertos del anfitrión no coinciden con los del contenedor porque la máquina virtual
+reenvía el 8443 al 443 y el 8081 al 8080. Cuando en este documento se cita un puerto, se dice
+cuál de los dos es.</p>
+
+<h2 id="s33">3.3 HTTPS y certificados</h2>
+<p>El sitio entero va por HTTPS. El VirtualHost del puerto 80 responde con un 301 al 443, y
+<code>.htaccess</code> refuerza la redirección para las rutas que pasan por reescritura.</p>
+
+<p>El certificado es autofirmado y lo genera el contenedor al arrancar si <code>certs/</code>
+está vacío. Cubre <code>tarraco.local</code>, <code>localhost</code> y <code>127.0.0.1</code>,
+que son los tres nombres con los que se prueba. El navegador avisa la primera vez porque la
+autoridad no es pública; es el comportamiento esperado de un certificado de laboratorio.</p>
+
+<pre class="code"><code><span class="c"># Genera la clave y el certificado con las tres identidades</span>
+bash scripts/gen-certs.sh
+openssl req -x509 -newkey rsa:2048 -nodes -days 365 \
+  -keyout certs/tarraco.key -out certs/tarraco.crt \
+  -subj <span class="s">"/C=ES/ST=Tarragona/L=Tarragona/O=Tarraco Parkings/CN=tarraco.local"</span> \
+  -addext <span class="s">"subjectAltName=DNS:tarraco.local,DNS:localhost,IP:127.0.0.1"</span>
+<cite>scripts/gen-certs.sh · líneas 9-26</cite></code></pre>
+
+<h2 id="s34">3.4 Copias de seguridad y restauración</h2>
+<p>La copia se hace con una sola orden y produce un fichero comprimido con fecha en el nombre.
+Se usa <code>--single-transaction</code> para no bloquear la base mientras copia, y se incluyen
+rutinas y disparadores, que son parte del esquema y sin ellos la restauración queda coja.</p>
+
+<pre class="code"><code>bash scripts/backup.sh
+<span class="c"># backups/tarraco_AAAAMMDD_HHMMSS.sql.gz</span>
+<cite>scripts/backup.sh · líneas 19-32</cite></code></pre>
+
+<p>La restauración está escrita en el manual técnico y se ha pensado para que se pueda hacer
+sin adivinar:</p>
+
+<pre class="code"><code>gunzip -c backups/tarraco_20261122_180000.sql.gz \
+  | docker compose exec -T db mariadb -u root -p<span class="s">"$DB_ROOT_PASSWORD"</span> tarraco_parkings
+<cite>docs/MANUAL_TECNICO.md · apartado 5.4</cite></code></pre>
+
+<div class="note warn">
+  <b>Una copia que no se ha restaurado nunca no es una copia.</b> Está comprobado que el
+  fichero se genera y que el comando de restauración es correcto, pero la prueba de restaurar en
+  un servidor aparte está pendiente y así queda anotado en el apartado 7.3.
+</div>
+
+<h2 id="s35">3.5 Monitorización</h2>
+<p>La aplicación expone sus propias métricas en <code>/metrics.php</code>, en formato Prometheus.
+No son capturas preparadas: los valores se leen de MariaDB en cada consulta de Prometheus, de
+modo que el panel de Grafana enseña el estado real del sistema en ese momento.</p>
+
+<table class="data">
+  <thead><tr><th style="width:44%">Métrica</th><th style="width:14%">Tipo</th><th>Qué mide</th></tr></thead>
+  <tbody>
+    <tr><td><code>tarraco_http_requests_total{class}</code></td><td>contador</td><td>Peticiones por clase 2xx, 3xx, 4xx y 5xx</td></tr>
+    <tr><td><code>tarraco_reservas_activas</code></td><td>indicador</td><td>Reservas <code>ACTIVA</code> o <code>EN_CURSO</code></td></tr>
+    <tr><td><code>tarraco_reservas_estado{estado}</code></td><td>indicador</td><td>Reservas por estado</td></tr>
+    <tr><td><code>tarraco_plazas_libres{parking}</code></td><td>indicador</td><td>Plazas disponibles por parking</td></tr>
+    <tr><td><code>tarraco_ingresos_confirmados</code></td><td>indicador</td><td>Euros cobrados y confirmados</td></tr>
+  </tbody>
+</table>
+
+<p>Los cuatro objetivos de Prometheus se ven en <code>UP</code>: la propia instancia,
+<code>node-exporter</code>, <code>cadvisor</code> y la aplicación. Grafana se aprovisiona sola al
+arrancar, con un panel que enseña reservas, ingresos, errores y consumo de CPU y memoria.</p>
+
+<div class="note">
+  <b>Un fallo que costó encontrar.</b> cAdvisor v0.49 arrancaba pero no veía ningún contenedor:
+  su cliente hablaba la API 1.41 y el daemon exigía la 1.44. Los paneles de CPU y memoria salían
+  vacíos sin dar ningún error. Desde la v0.55 los detecta, y el manual explica cómo comprobarlo.
+</div>
+
+<!-- ===================== 4 ===================== -->
+<h1 class="section" id="s4">4. Modelo de datos</h1>
+
+<h2 id="s41">4.1 Las once entidades</h2>
+<p>El modelo tiene once entidades agrupadas por responsabilidad, no por orden de creación. Cada
+grupo se conecta con los demás por claves foráneas.</p>
+
+<table class="data">
+  <thead><tr><th style="width:18%">Grupo</th><th style="width:34%">Entidades</th><th>Qué guarda</th></tr></thead>
+  <tbody>
+    <tr><td>Cuentas</td><td><code>CLIENTE</code>, <code>VEHICULO</code>, <code>METODO_PAGO</code></td><td>Quién reserva, con qué coche y con qué paga</td></tr>
+    <tr><td>Oferta</td><td><code>PARKING</code>, <code>PLAZA</code>, <code>TARIFA</code></td><td>Qué se ofrece y a qué precio</td></tr>
+    <tr><td>Operación</td><td><code>RESERVA</code>, <code>PAGO</code>, <code>REGISTRO_ACCESO</code></td><td>Qué se contrata, qué se cobra y quién entra</td></tr>
+    <tr><td>Gestión</td><td><code>ADMINISTRADOR</code>, <code>REGISTRO_AUDITORIA</code></td><td>Quién manda y qué ha hecho</td></tr>
+  </tbody>
+</table>
+
+<p>La tabla central es <code>RESERVA</code>. Concentra cinco claves foráneas (cliente, vehículo,
+parking, plaza y tarifa) y los importes congelados en el momento de crear. Alrededor de ella se
+ordenan el cobro, el acceso y la auditoría.</p>
+
+<h2 id="s42">4.2 Las quince relaciones</h2>
+<p>Estas son las quince relaciones con su cardinalidad mínima y máxima. La columna de la
+izquierda es la entidad que tiene la clave foránea.</p>
+
+<table class="data compact fluida">
+  <thead><tr><th style="width:26%">Desde</th><th style="width:8%">Card.</th><th style="width:26%">Hacia</th><th>Significado</th></tr></thead>
+  <tbody>
+    <tr><td><code>VEHICULO.id_cliente</code></td><td>1:N</td><td><code>CLIENTE</code></td><td>Un cliente tiene de uno a varios vehículos</td></tr>
+    <tr><td><code>METODO_PAGO.id_cliente</code></td><td>1:N</td><td><code>CLIENTE</code></td><td>Un cliente puede tener varios métodos</td></tr>
+    <tr><td><code>PLAZA.id_parking</code></td><td>1:N</td><td><code>PARKING</code></td><td>Un parking tiene una o muchas plazas</td></tr>
+    <tr><td><code>TARIFA.id_parking</code></td><td>1:N</td><td><code>PARKING</code></td><td>Un parking tiene una o muchas tarifas, con vigencia</td></tr>
+    <tr><td><code>RESERVA.id_cliente</code></td><td>1:N</td><td><code>CLIENTE</code></td><td>Un cliente tiene cero o muchas reservas</td></tr>
+    <tr><td><code>RESERVA.id_vehiculo</code></td><td>1:N</td><td><code>VEHICULO</code></td><td>Un vehículo acumula cero o muchas reservas</td></tr>
+    <tr><td><code>RESERVA.id_parking</code></td><td>1:N</td><td><code>PARKING</code></td><td>Un parking recibe cero o muchas reservas</td></tr>
+    <tr><td><code>RESERVA.id_plaza</code></td><td>1:N</td><td><code>PLAZA</code></td><td>Opcional: una plaza puede no estar asignada todavía</td></tr>
+    <tr><td><code>RESERVA.id_tarifa</code></td><td>1:N</td><td><code>TARIFA</code></td><td>La tarifa aplicada queda fijada en la reserva</td></tr>
+    <tr><td><code>PAGO.id_reserva</code></td><td>1:N</td><td><code>RESERVA</code></td><td>Una reserva puede tener el cobro y el exceso</td></tr>
+    <tr><td><code>PAGO.id_metodo_pago</code></td><td>1:N</td><td><code>METODO_PAGO</code></td><td>Un método puede cobrar varios pagos</td></tr>
+    <tr><td><code>REGISTRO_ACCESO.id_parking</code></td><td>1:N</td><td><code>PARKING</code></td><td>Cada parking registra sus movimientos</td></tr>
+    <tr><td><code>REGISTRO_ACCESO.id_vehiculo</code></td><td>1:N</td><td><code>VEHICULO</code></td><td>Un vehículo puede tener muchos accesos</td></tr>
+    <tr><td><code>REGISTRO_ACCESO.id_reserva</code></td><td>1:N</td><td><code>RESERVA</code></td><td>Opcional: un intento puede no corresponder a ninguna</td></tr>
+    <tr><td><code>REGISTRO_AUDITORIA.id_admin</code></td><td>1:N</td><td><code>ADMINISTRADOR</code></td><td>Cada acción del panel queda atribuida a quien la hizo</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s43">4.3 Diagrama E/R actualizado</h2>
+<p>El diagrama enseña las entidades y sus conexiones, que es lo que faltaba en la exposición del
+Sprint 1. La versión con todos los atributos de cada tabla está en el anexo de
+<code>docs/MODELO_LOGICO.md</code>.</p>
+
+<figure class="wide" style="page-break-after:auto;">
+  <img src="img/modelo-er.svg" alt="Diagrama entidad/relación del modelo" style="width:100%;max-height:210mm;object-fit:contain;">
+  <figcaption><b>Figura 4.1.</b> Modelo entidad/relación con las once entidades, sus claves y las
+  quince relaciones, sin la entidad de hardware que se retiró.</figcaption>
+</figure>
+
+<h2 id="s44">4.4 Integridad en la base de datos</h2>
+<p>Las reglas que no se pueden saltar están donde no se pueden esquivar: en MariaDB. Un
+programa mal escrito o una consola abierta se encuentran la misma barrera que la web.</p>
+
+<ul>
+  <li><b>Quince claves foráneas con <code>ON DELETE RESTRICT</code>.</b> No se puede borrar un
+      cliente que tiene reservas, ni un parking con plazas.</li>
+  <li><b>Restricciones <code>CHECK</code></b> de fechas, importes, precios y capacidades: una
+      salida anterior a la entrada no entra en la base.</li>
+  <li><b>Disparador de no borrado.</b> Un <code>DELETE</code> sobre <code>RESERVA</code> aborta
+      con el error 45000 y el mensaje «Las reservas no se borran nunca».</li>
+  <li><b>Disparador de transiciones.</b> Solo se permiten siete cambios de estado, los del ciclo
+      de vida previsto. De <code>FINALIZADA</code> no se vuelve a ningún sitio.</li>
+  <li><b>Índices</b> en las columnas por las que filtran las consultas del panel.</li>
+</ul>
+
+<pre class="code"><code><span class="k">CREATE TRIGGER</span> trg_reserva_transicion <span class="k">BEFORE UPDATE ON</span> RESERVA
+<span class="k">FOR EACH ROW</span>
+<span class="k">BEGIN</span>
+  <span class="k">IF</span> OLD.estado &lt;&gt; NEW.estado <span class="k">THEN</span>
+    <span class="k">IF NOT</span> (
+         (OLD.estado = <span class="s">'PENDIENTE_PAGO'</span> <span class="k">AND</span> NEW.estado <span class="k">IN</span> (<span class="s">'ACTIVA'</span>,<span class="s">'CANCELADA'</span>))
+      <span class="k">OR</span> (OLD.estado = <span class="s">'ACTIVA'</span> <span class="k">AND</span> NEW.estado <span class="k">IN</span> (<span class="s">'EN_CURSO'</span>,<span class="s">'CANCELADA'</span>,<span class="s">'NO_PRESENTADA'</span>))
+      <span class="k">OR</span> (OLD.estado = <span class="s">'EN_CURSO'</span> <span class="k">AND</span> NEW.estado <span class="k">IN</span> (<span class="s">'FINALIZADA'</span>,<span class="s">'CON_EXCESO'</span>))
+    ) <span class="k">THEN</span>
+      <span class="k">SIGNAL SQLSTATE</span> <span class="s">'45000'</span>
+        <span class="k">SET</span> MESSAGE_TEXT = <span class="s">'Transicion de estado de reserva no permitida.'</span>;
+    <span class="k">END IF</span>;
+  <span class="k">END IF</span>;
+<span class="k">END</span>$$
+<cite>db/init.sql · líneas 611-628</cite></code></pre>
+
+<h2 id="s45">4.5 Qué cambia respecto al Sprint 1</h2>
+<p>El modelo aprobado se mantiene. Los cambios son seis y cada uno tiene un motivo escrito en
+<code>docs/DECISIONES-SPRINT2.md</code>.</p>
+
+<table class="data">
+  <thead><tr><th style="width:34%">Cambio</th><th>Motivo</th></tr></thead>
+  <tbody>
+    <tr><td>Fuera <code>DISPOSITIVO</code></td><td>No hay ningún equipo que identificar: lo pidió el profesorado</td></tr>
+    <tr><td>Fuera <code>barrera_abierta</code></td><td>No hay barrera que controlar</td></tr>
+    <tr><td>Entran <code>ADMINISTRADOR</code> y <code>REGISTRO_AUDITORIA</code></td><td>El panel necesita cuentas propias y traza de lo que se hace</td></tr>
+    <tr><td>Entra <code>condiciones_aceptadas</code></td><td>El enunciado pide aceptar las condiciones antes de confirmar, y hay que poder demostrarlo</td></tr>
+    <tr><td><code>PLAZA.estado</code> sin <code>RESERVADA</code></td><td>La reserva ya dice qué plaza está ocupada en cada franja; dos verdades acaban en contradicción</td></tr>
+    <tr><td>Siete estados de reserva</td><td><code>EN_CURSO</code> y <code>NO_PRESENTADA</code> hacen falta para el control de acceso</td></tr>
+  </tbody>
+</table>
+
+<p>Los importes se congelan al crear la reserva: una subida de tarifa no reescribe lo cobrado.</p>
+
+<!-- ===================== 5 ===================== -->
+<h1 class="section" id="s5">5. Implementación y código</h1>
+
+<h2 id="s51">5.1 Estructura del código</h2>
+<p>El proyecto son 37 archivos PHP y unas 5.900 líneas, organizadas en capas. No hay framework:
+hay una clase por concepto y un autocargador que resuelve el nombre del archivo.</p>
+
+<pre class="code"><code>app/
+  public/        <span class="c">● lo único que Apache sirve: páginas y endpoints</span>
+  src/           <span class="c">● lógica: Auth, Reservation, Payment, AccessControl, Pdf…</span>
+  config/        <span class="c">● credenciales y parámetros, fuera del alcance de Apache</span>
+  templates/     <span class="c">● cabecera, navegación y pie comunes</span>
+  docker/        <span class="c">● VirtualHost con SSL y punto de entrada</span>
+db/init.sql      <span class="c">● DDL, datos de ejemplo, disparadores</span>
+monitor/         <span class="c">● Prometheus y el panel de Grafana</span>
+tests/           <span class="c">● cinco suites ejecutables</span></code></pre>
+
+<p>La separación importa: una página de <code>public/</code> valida la entrada, llama a una clase
+de <code>src/</code> y pinta la plantilla. Ninguna consulta SQL se escribe en la vista. Esa regla
+es la que permite que las pruebas de cálculo se ejecuten sin base de datos.</p>
+
+<h2 id="s52">5.2 La reserva en una transacción</h2>
+<p>El problema real de una reserva es que dos clientes no reciban la misma plaza. La solución no
+es comprobar antes de insertar, porque entre la comprobación y el <code>INSERT</code> cabe otra
+petición. La plaza se busca y se bloquea dentro de la misma transacción.</p>
+
+<pre class="code"><code><span class="c">// Dentro de Database::transaction(), con la plaza bloqueada por FOR UPDATE</span>
+$plaza = Parking::plazaDisponible(
+    (int) $parking[<span class="s">'id_parking'</span>],
+    $tipos,
+    $entrada,
+    $salida,
+    $pdo
+);
+<span class="k">if</span> ($plaza === <span class="k">null</span>) {
+    <span class="k">throw new</span> DomainException(
+        <span class="s">'No quedan plazas libres de este tipo en la franja seleccionada.'</span>
+    );
+}
+
+$horas    = Payment::horasFacturables($entrada, $salida);
+$importes = Payment::calcular(
+    (float) $tarifa[<span class="s">'precio_hora'</span>],
+    (float) $tarifa[<span class="s">'porcentaje_gestion'</span>],
+    $horas
+);
+<cite>app/src/Reservation.php · líneas 150-176</cite></code></pre>
+
+<p>La búsqueda de plaza libre usa <code>NOT EXISTS</code> contra las reservas que ocupan franja y
+<code>FOR UPDATE</code> para que la fila quede bloqueada hasta el final de la transacción. Si no
+hay plaza, se lanza una excepción y no se crea nada: ni reserva, ni pago, ni plaza asignada.</p>
+
+<p>La reserva nace en <code>PENDIENTE_PAGO</code>, se registra el cobro simulado y pasa a
+<code>ACTIVA</code> dentro de la misma transacción. Si el cobro fallara, se quedaría pendiente y
+la plaza se liberaría al caducar el bloqueo de quince minutos.</p>
+
+<h2 id="s53">5.3 El precio y el exceso</h2>
+<p>El cálculo es una función pura, sin base de datos, y por eso se puede probar entera. La regla
+es la del enunciado: horas completas o fracción, con un mínimo de una, y un 10 % de gestión
+sobre el importe base.</p>
+
+<pre class="code"><code><span class="k">public static function</span> calcular(<span class="k">float</span> $precioHora, <span class="k">float</span> $porcentajeGestion, <span class="k">int</span> $horas): <span class="k">array</span>
+{
+    $base    = round($precioHora * $horas, 2);
+    $gestion = round($base * $porcentajeGestion, 2);
+
+    <span class="k">return</span> [
+        <span class="s">'horas'</span>   =&gt; $horas,
+        <span class="s">'base'</span>    =&gt; $base,
+        <span class="s">'gestion'</span> =&gt; $gestion,
+        <span class="s">'total'</span>   =&gt; round($base + $gestion, 2),
+    ];
+}
+<cite>app/src/Payment.php · líneas 33-54</cite></code></pre>
+
+<p>Las horas facturables se calculan con <code>ceil</code> sobre los minutos y un mínimo de una.
+Una reserva de 8:00 a 10:30 son 3 horas, no 2,5. El exceso funciona igual pero con quince
+minutos de gracia y sin el 10 % de gestión, porque no hay servicio que gestionar: solo tiempo
+extra.</p>
+
+<table class="data">
+  <thead><tr><th style="width:34%">Caso</th><th style="width:22%">Cálculo</th><th>Resultado</th></tr></thead>
+  <tbody>
+    <tr><td>4 horas a 1,80 €/h</td><td>7,20 + 0,72</td><td>7,92 € con gestión incluida</td></tr>
+    <tr><td>30 minutos a 1,80 €/h</td><td>1 hora × 1,80</td><td>1,80 € de base, mínimo una hora</td></tr>
+    <tr><td>Salida 2 h 20 min tarde, 15 min de gracia</td><td>125 − 15 = 110 min → 2 h</td><td>2 horas de exceso, sin gestión</td></tr>
+    <tr><td>Salida 10 min tarde</td><td>dentro de la gracia</td><td>0 € de exceso</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s54">5.4 El control de acceso</h2>
+<p>La entrada se autoriza con cuatro condiciones encadenadas: el vehículo existe, la matrícula
+es de la cuenta que la teclea (o de cualquiera, si es el administrador), hay una reserva
+<code>ACTIVA</code> en ese parking y la hora cae dentro de la franja con treinta minutos de
+margen. Cualquier intento se registra, autorizado o no, con su motivo.</p>
+
+<pre class="code"><code><span class="c">// Un vehículo no puede estar dentro de dos parkings a la vez</span>
+$dentro = $pdo-&gt;prepare(
+    <span class="s">"SELECT id_parking FROM RESERVA</span>
+<span class="s">      WHERE id_vehiculo = :vehiculo AND estado = 'EN_CURSO' LIMIT 1"</span>
+);
+$dentro-&gt;execute([<span class="s">'vehiculo'</span> =&gt; (int) $vehiculo[<span class="s">'id_vehiculo'</span>]]);
+
+<span class="k">if</span> ($parkingDentro !== <span class="k">false</span>) {
+    $id = self::registrar($pdo, $idParking, (int) $vehiculo[<span class="s">'id_vehiculo'</span>], <span class="k">null</span>,
+        $placa, <span class="s">'ENTRADA'</span>, <span class="k">false</span>, <span class="s">'El vehículo ya consta dentro de un parking.'</span>);
+    <span class="k">return</span> [<span class="s">'ok'</span> =&gt; <span class="k">false</span>, <span class="s">'mensaje'</span> =&gt; <span class="s">'El vehículo ya consta dentro de un parking.'</span>];
+}
+<cite>app/src/AccessControl.php · líneas 56-72</cite></code></pre>
+
+<p>La salida cobra el exceso con el método de pago de la reserva y lo registra como un pago
+aparte, de tipo <code>EXCESO</code>. La reserva pasa a <code>CON_EXCESO</code> o a
+<code>FINALIZADA</code> según haya retraso o no.</p>
+
+<h2 id="s55">5.5 El resguardo PDF</h2>
+<p>El enunciado pide un número de reserva y un PDF para acceder al parking. El PDF se genera al
+vuelo con los datos de la reserva, no se guarda en disco, y solo lo puede descargar su dueño o
+un administrador con sesión abierta.</p>
+
+<p>No hay librería de PDF en el contenedor y no la puede haber: solo se instalan
+<code>pdo_mysql</code> y <code>mbstring</code>, y el aula no tiene red para traer Composer. Escribí
+un generador mínimo, de unas 300 líneas, que hace lo que hace falta para un documento de una
+página.</p>
+
+<pre class="code"><code><span class="c">// WinAnsi es la codificación que entienden las fuentes estándar del PDF.</span>
+<span class="c">// Sin esta conversión, las tildes y el euro salen como bytes sueltos.</span>
+<span class="k">private static function</span> aWinAnsi(<span class="k">string</span> $texto): <span class="k">string</span>
+{
+    $convertido = @iconv(<span class="s">'UTF-8'</span>, <span class="s">'Windows-1252//TRANSLIT'</span>, $texto);
+    <span class="k">return</span> $convertido === <span class="k">false</span> ? $texto : $convertido;
+}
+<cite>app/src/Pdf.php · líneas 79-86</cite></code></pre>
+
+<p>Lo que el generador resuelve, y que se nota cuando falta: las anchuras reales de Helvetica
+para partir las líneas y alinear los importes a la derecha, la conversión a WinAnsi y la
+numeración de páginas. El resguardo lleva el código de reserva, la plaza, la franja, el desglose
+del importe, los cobros con su referencia y la marca de las condiciones aceptadas.</p>
+
+<figure>
+  <img src="img/captura-22-resguardo-pdf.png" alt="Resguardo PDF generado por la aplicación" style="width:100%;border:.25mm solid var(--line);">
+  <figcaption><b>Figura 5.1.</b> Resguardo servido por <code>/reservation-pdf.php</code> desde los
+  datos reales de una reserva creada en la prueba de extremo a extremo.</figcaption>
+</figure>
+
+<h2 id="s56">5.6 Seguridad</h2>
+<p>Las decisiones de seguridad están tomadas en el servidor y se pueden enumerar sin adornos.</p>
+
+<p>La revisión del 21 de octubre encontró el defecto que habría roto el flujo principal: la
+consulta de plaza libre tenía los parámetros posicionales desordenados y no se habría podido
+crear ninguna reserva. Se pasó a marcadores con nombre y <code>tests/check_sql_params.php</code>
+vigila las 99 consultas del proyecto.</p>
+
+<table class="data">
+  <thead><tr><th style="width:26%">Riesgo</th><th>Cómo se cubre</th></tr></thead>
+  <tbody>
+    <tr><td>Contraseñas</td><td><code>password_hash()</code> con bcrypt y coste 12; nunca se guarda en claro ni se escribe en el registro</td></tr>
+    <tr><td>Sesiones</td><td>Cookie <code>HttpOnly</code>, <code>Secure</code> con HTTPS, <code>SameSite=Lax</code> y regeneración del identificador al entrar</td></tr>
+    <tr><td>CSRF</td><td>Token en todos los formularios que escriben, comparado con <code>hash_equals</code></td></tr>
+    <tr><td>Inyección SQL</td><td>PDO con sentencias preparadas reales y marcadores con nombre; <code>ATTR_EMULATE_PREPARES</code> en falso</td></tr>
+    <tr><td>XSS</td><td>Toda salida pasa por <code>e()</code>, que aplica <code>htmlspecialchars</code> con <code>ENT_QUOTES</code></td></tr>
+    <tr><td>Autorización</td><td>Sesiones separadas de cliente y administrador, y <code>requireRole()</code> en cada escritura</td></tr>
+    <tr><td>Datos de tarjeta</td><td>No se guardan. El método solo contiene una referencia de pasarela simulada</td></tr>
+    <tr><td>Cabeceras</td><td><code>X-Content-Type-Options</code>, <code>X-Frame-Options</code> y <code>Referrer-Policy</code></td></tr>
+  </tbody>
+</table>
+
+<!-- ===================== 6 ===================== -->
+<h1 class="section" id="s6">6. Planificación actualizada</h1>
+
+<h2 id="s61">6.1 Método y herramienta</h2>
+<p>La planificación del Sprint 1 se hizo con Trello y un diagrama de Gantt de cinco semanas.
+Para el Sprint 2 se mantiene la misma herramienta y se actualiza el plan con lo que ha pasado de
+verdad: dos tareas nuevas por exigencias del enunciado, una tarea retirada por la indicación del
+profesorado y una duración real mayor que la prevista en las pruebas.</p>
+
+<p>El tablero usa las columnas de siempre (por hacer, en curso, en revisión y hecho), una etiqueta
+de prioridad por tarjeta y un responsable por tarjeta. Las tarjetas son las mismas tareas que
+aparecen en el Gantt, con el mismo código, para que no haya dos listas que se contradigan.</p>
+
+<h2 id="s62">6.2 Tareas y reparto de roles</h2>
+<p>El reparto sigue los roles que salieron de la prueba de personalidad del curso, y es el mismo
+que se aprobó en el Sprint 1. Cambia el contenido de las tareas, no quién las hace.</p>
+
+<table class="data compact fluida">
+  <thead><tr><th style="width:8%">Cód.</th><th style="width:34%">Tarea</th><th style="width:7%">Resp.</th><th style="width:9%">Prior.</th><th>Estado</th></tr></thead>
+  <tbody>
+    <tr><td>4.1</td><td>Modelo relacional y DDL completo</td><td>DM</td><td>P1</td><td>Hecha</td></tr>
+    <tr><td>4.2</td><td>Diseño de interfaz y hoja de estilos propia</td><td>BS</td><td>P1</td><td>Hecha</td></tr>
+    <tr><td>4.3</td><td>Servidor Apache + PHP + MariaDB con Docker y SSL</td><td>PB</td><td>P1</td><td>Hecha</td></tr>
+    <tr><td>5.1</td><td>Autenticación, registro, perfil y sesiones separadas</td><td>DM</td><td>P1</td><td>Hecha</td></tr>
+    <tr><td>5.2</td><td>Vehículos y métodos de pago</td><td>BS</td><td>P1</td><td>Hecha</td></tr>
+    <tr><td>6.1</td><td>Motor de precios, tarifas con vigencia y cálculo del exceso</td><td>DM</td><td>P1</td><td>Hecha</td></tr>
+    <tr><td>6.2</td><td>Resguardo PDF de la reserva</td><td>BS</td><td>P1</td><td>Hecha el 28/10</td></tr>
+    <tr><td>6.3</td><td>Condiciones de la reserva y aceptación con marca de tiempo</td><td>BS</td><td>P1</td><td>Hecha el 28/10</td></tr>
+    <tr><td>7.1</td><td>Parkings, plazas y tarifas desde el panel</td><td>PB</td><td>P1</td><td>Hecha</td></tr>
+    <tr><td>8.1</td><td>Control de acceso por matrícula, entrada y salida</td><td>PB</td><td>P1</td><td>Hecha</td></tr>
+    <tr><td>9.1</td><td>Seguridad, copias de seguridad y monitorización</td><td>PB</td><td>P2</td><td>Hecha</td></tr>
+    <tr><td>10.1</td><td>Pruebas, corrección de defectos y auditoría del código</td><td>Todos</td><td>P1</td><td>Hecha el 29/10</td></tr>
+    <tr><td>10.2</td><td>Manual técnico y manual de usuario</td><td>BS</td><td>P2</td><td>Hechos</td></tr>
+    <tr><td>10.3</td><td>Documento de presentación</td><td>PB</td><td>P1</td><td>Hecho el 28/10</td></tr>
+    <tr><td>11.1</td><td>Presentación y vídeo de demostración</td><td>Todos</td><td>P1</td><td>Hecha el 28/10</td></tr>
+    <tr><td>11.2</td><td>Ensayo, revisión final y entrega</td><td>Todos</td><td>P1</td><td>Hecha el 29/10</td></tr>
+  </tbody>
+</table>
+
+<p>La tarea 7.2 del plan original, «inventario de dispositivos instalados», se ha eliminado. No
+se puede inventariar un equipo que ya no forma parte del sistema.</p>
+
+<h2 id="s63">6.3 Diagrama de Gantt</h2>
+<p>El diagrama cubre las siete semanas del sprint, del 9 de octubre al 22 de noviembre. Cada
+barra es una tarea, el color indica quién la hace y la columna de la derecha dice en qué punto
+está hoy.</p>
+
+<table class="gantt">
+  <thead>
+    <tr>
+      <th colspan="2"></th>
+      <th class="chart">
+        <div class="weeks">
+          <span>9-15 oct</span><span>16-22 oct</span><span>23-29 oct</span><span>30 oct-5 nov</span>
+          <span>6-12 nov</span><span>13-19 nov</span><span>20-22 nov</span>
+        </div>
+      </th>
+      <th></th>
+    </tr>
+    <tr><th style="width:34%">Tarea</th><th style="width:6%">Resp.</th><th style="width:48%">Semanas</th><th style="width:12%">Estado</th></tr>
+  </thead>
+  <tbody>
+    <tr class="group"><td>Fase 4 · Diseño técnico y despliegue</td><td>PB</td><td class="chart"></td><td></td></tr>
+    <tr class="task"><td>4.1 Modelo relacional y DDL</td><td>DM</td>
+      <td class="chart"><span class="bar" style="left:0%;width:14.3%;background:#6c3483"></span></td><td>Hecha</td></tr>
+    <tr class="task"><td>4.2 Diseño de interfaz</td><td>BS</td>
+      <td class="chart"><span class="bar" style="left:0%;width:14.3%;background:#117864"></span></td><td>Hecha</td></tr>
+    <tr class="task"><td>4.3 Servidor LAMP, Docker y SSL</td><td>PB</td>
+      <td class="chart"><span class="bar" style="left:0%;width:28.6%;background:#1a4e89"></span></td><td>Hecha</td></tr>
+
+    <tr class="group"><td>Fase 5 · Módulo de usuarios</td><td>DM · BS</td><td class="chart"></td><td></td></tr>
+    <tr class="task"><td>5.1 Autenticación, perfil y sesiones</td><td>DM</td>
+      <td class="chart"><span class="bar" style="left:7.1%;width:21.4%;background:#6c3483"></span></td><td>Hecha</td></tr>
+    <tr class="task"><td>5.2 Vehículos y métodos de pago</td><td>BS</td>
+      <td class="chart"><span class="bar" style="left:14.3%;width:14.3%;background:#117864"></span></td><td>Hecha</td></tr>
+
+    <tr class="group"><td>Fase 6 · Reservas y precios</td><td>DM · BS</td><td class="chart"></td><td></td></tr>
+    <tr class="task"><td>6.1 Motor de precios y tarifas</td><td>DM</td>
+      <td class="chart"><span class="bar" style="left:7.1%;width:21.4%;background:#6c3483"></span></td><td>Hecha</td></tr>
+    <tr class="task"><td>6.2 Resguardo PDF de la reserva</td><td>BS</td>
+      <td class="chart"><span class="bar" style="left:28.6%;width:14.3%;background:#117864"></span></td><td>Hecha</td></tr>
+    <tr class="task"><td>6.3 Condiciones y aceptación</td><td>BS</td>
+      <td class="chart"><span class="bar" style="left:28.6%;width:14.3%;background:#117864"></span></td><td>Hecha</td></tr>
+
+    <tr class="group"><td>Fase 7 y 8 · Administración y acceso</td><td>PB</td><td class="chart"></td><td></td></tr>
+    <tr class="task"><td>7.1 Parkings, plazas y tarifas</td><td>PB</td>
+      <td class="chart"><span class="bar" style="left:14.3%;width:28.6%;background:#1a4e89"></span></td><td>Hecha</td></tr>
+    <tr class="task"><td>8.1 Control de acceso por matrícula</td><td>PB</td>
+      <td class="chart"><span class="bar" style="left:21.4%;width:21.4%;background:#1a4e89"></span></td><td>Hecha</td></tr>
+
+    <tr class="group"><td>Fase 9 · Seguridad y operación</td><td>PB</td><td class="chart"></td><td></td></tr>
+    <tr class="task"><td>9.1 Seguridad, copias y monitorización</td><td>PB</td>
+      <td class="chart"><span class="bar" style="left:28.6%;width:14.3%;background:#1a4e89"></span></td><td>Hecha</td></tr>
+
+    <tr class="group"><td>Fase 10 · Validación y documentación</td><td>Todos</td><td class="chart"></td><td></td></tr>
+    <tr class="task"><td>10.1 Pruebas y corrección de defectos</td><td>Todos</td>
+      <td class="chart"><span class="bar" style="left:14.3%;width:42.9%;background:#b9770e"></span></td><td>Hecha</td></tr>
+    <tr class="task"><td>10.2 Manual técnico y de usuario</td><td>BS</td>
+      <td class="chart"><span class="bar" style="left:28.6%;width:21.4%;background:#117864"></span></td><td>Hechos</td></tr>
+    <tr class="task"><td>10.3 Documento de presentación</td><td>PB</td>
+      <td class="chart"><span class="bar" style="left:35.7%;width:21.4%;background:#1a4e89"></span></td><td>Hecho</td></tr>
+
+    <tr class="group"><td>Fase 11 · Exposición y entrega</td><td>Todos</td><td class="chart"></td><td></td></tr>
+    <tr class="task"><td>11.1 Presentación y vídeo</td><td>Todos</td>
+      <td class="chart"><span class="bar" style="left:42.9%;width:14.3%;background:#b9770e"></span></td><td>Hecha</td></tr>
+    <tr class="task"><td>11.2 Ensayo y entrega</td><td>Todos</td>
+      <td class="chart"><span class="bar" style="left:85.7%;width:14.3%;background:#1a4e89"></span></td><td>Hecha</td></tr>
+  </tbody>
+</table>
+<p style="font-size:8.5pt;color:var(--muted);margin-top:-1mm;">
+  Azul: Pere Brau · Lila: Dhruva Mehta · Verde: Boubacar Seck · Naranja: todo el grupo.
+</p>
+
+<p>El camino crítico pasa por 4.1 (modelo y DDL) y 4.3 (servidor), porque ninguna otra tarea
+puede empezar sin base de datos ni sin sitio donde ejecutarla. Las dos se resolvieron en la
+primera semana, y por eso las pruebas pudieron empezar el 20 de octubre y no el 5 de noviembre.</p>
+
+<h2 id="s64">6.4 Qué se desvió y por qué</h2>
+<p>El plan se cumplió en las tareas de producto y se desvió en dos cosas. Las dos están
+registradas en <code>docs/INCIDENCIAS.md</code> con su ficha.</p>
+
+<ol>
+  <li><b>Las pruebas costaron más de lo previsto.</b> La prueba de extremo a extremo solo
+      funcionaba una vez: creaba datos fijos y la segunda pasada chocaba contra las claves únicas.
+      Se reescribió para que genere su propia cuenta, vehículo y parking en cada ejecución, y
+      ahora se puede repetir.</li>
+  <li><b>Dos requisitos del enunciado llegaron tarde al plan.</b> El resguardo PDF y la
+      aceptación de condiciones estaban en el enunciado desde el principio, pero no en la lista
+      de tareas. Se añadieron el 28 de octubre como 6.2 y 6.3, y son las dos únicas tareas que se
+      han hecho fuera de la ventana prevista.</li>
+</ol>
+
+<p>El resto de desviaciones son de fecha, no de alcance: la revisión completa del código se hizo
+el 21 de octubre, las capturas el 23 y la presentación y el documento se cerraron el 28. La
+entrega está abierta hasta el 22 de noviembre, así que ninguna de las tres llega tarde.</p>
+
+<!-- ===================== 7 ===================== -->
+<h1 class="section" id="s7">7. Verificación</h1>
+
+<h2 id="s71">7.1 Qué se ejecutó y qué devolvió</h2>
+<p>Todo lo que sigue se ha ejecutado el 28 de octubre sobre la máquina virtual, con el stack
+levantado desde cero: <code>docker compose down -v</code> y <code>up -d --build</code>. La base se
+recreó desde <code>db/init.sql</code>, así que las cifras no arrastran pruebas anteriores. Después
+de esa pasada se corrigieron cuatro cosas en el código, y <b>las dos suites se repitieron el 29 de
+octubre con el volumen borrado y la base sembrada de nuevo</b>: los totales no bajaron. El detalle
+de las dos pasadas está en <code>docs/VERIFICACION-SPRINT2.md</code>, §4.1.</p>
+
+<table class="data">
+  <thead><tr><th style="width:40%">Prueba</th><th style="width:20%">Dónde se ejecuta</th><th>Resultado</th></tr></thead>
+  <tbody>
+    <tr><td><code>scripts/smoke-test.sh</code></td><td>dentro de la VM</td><td><b>19/19</b> correctas</td></tr>
+    <tr><td><code>tests/e2e_client.py</code></td><td>desde el portátil contra el 8443</td><td><b>53/53</b> correctas</td></tr>
+    <tr><td><code>tests/pricing_test.php</code></td><td>sin base de datos</td><td>22 comprobaciones correctas</td></tr>
+    <tr><td><code>tests/check_schema.py</code></td><td>sobre <code>db/init.sql</code></td><td>11 tablas, 15 claves foráneas, esquema válido</td></tr>
+    <tr><td><code>tests/check_sql_params.php</code></td><td>sobre <code>app/src</code></td><td>99 consultas, ningún marcador huérfano</td></tr>
+    <tr><td><code>tests/check_links.py</code></td><td>sobre el repositorio</td><td>96 referencias, todas resuelven</td></tr>
+    <tr><td><code>php -l</code> sobre los 37 archivos de <code>app/</code></td><td>sin base de datos</td><td>0 errores de sintaxis</td></tr>
+  </tbody>
+</table>
+
+<p>El smoke test comprueba cuatro bloques: contenedores, HTTPS y redirección, base de datos y
+monitorización. La parte de integridad de la base es la que más vale,
+porque compara los importes de todas las reservas con su tarifa, verifica que ninguna salida
+tardía se quedó sin cobrar el exceso y confirma que el disparador rechaza un
+<code>DELETE</code>.</p>
+
+<p>La prueba de extremo a extremo recorre nueve bloques: páginas públicas, alta de cuenta y
+sesión, reserva con precio, control de acceso de entrada y salida, aislamiento entre clientes,
+panel de administración, alta de un parking, retirada de una plaza y métricas. Crea datos propios
+en cada pasada, de modo que se puede repetir sin limpiar la base.</p>
+
+<div class="note">
+  <b>Una comprobación que se añadió por un defecto real.</b> El pago de la reserva 2 de los datos
+  de ejemplo tenía 15,84 € cuando su total eran 7,92 €. Los totales de las reservas cuadraban y
+  el smoke test no lo veía, porque solo comparaba reservas. Ahora hay una comprobación que cruza
+  <code>PAGO</code> con <code>RESERVA</code> y el dato está corregido.
+</div>
+
+<h2 id="s72">7.2 El enunciado, punto por punto</h2>
+<p>Esta es la lectura del enunciado del Sprint 2 y dónde se cumple cada punto. Es la tabla que
+conviene mirar si solo se quiere comprobar si falta algo.</p>
+
+<table class="data compact fluida">
+  <thead><tr><th style="width:44%">Lo que pide el enunciado</th><th style="width:12%">Estado</th><th>Dónde</th></tr></thead>
+  <tbody>
+    <tr><td>Apache2 con PHP</td><td class="ok">Cumple</td><td><code>app/Dockerfile</code>, <code>docker-compose.yml</code></td></tr>
+    <tr><td>MySQL o MariaDB y phpMyAdmin</td><td class="ok">Cumple</td><td><code>tarraco-db</code>, <code>tarraco-phpmyadmin</code></td></tr>
+    <tr><td>Certificado SSL</td><td class="ok">Cumple</td><td>VirtualHost 443, <code>scripts/gen-certs.sh</code></td></tr>
+    <tr><td>Monitorización del servidor</td><td class="ok">Cumple</td><td>Prometheus, Grafana, node-exporter, cAdvisor</td></tr>
+    <tr><td>Página de inicio con información de los parkings</td><td class="ok">Cumple</td><td><code>public/index.php</code></td></tr>
+    <tr><td>Formulario de reserva</td><td class="ok">Cumple</td><td><code>public/reservation.php</code></td></tr>
+    <tr><td>Datos del cliente y del vehículo</td><td class="ok">Cumple</td><td><code>register.php</code>, <code>vehicles.php</code>, <code>profile.php</code></td></tr>
+    <tr><td>Cálculo automático del precio</td><td class="ok">Cumple</td><td><code>src/Payment.php</code>, cálculo en vivo con <code>quote.php</code></td></tr>
+    <tr><td>Gestión por administradores y otros roles</td><td class="ok">Cumple</td><td><code>public/admin/</code>, roles <code>ADMIN</code> y <code>OPERADOR</code></td></tr>
+    <tr><td>El cliente se tiene que registrar para actuar</td><td class="ok">Cumple</td><td><code>Auth::checkAuth()</code> en todas las páginas de cliente</td></tr>
+    <tr><td>Planificación del proyecto actualizada</td><td class="ok">Cumple</td><td>Apartado 6 de este documento</td></tr>
+    <tr><td>Manual de usuario</td><td class="ok">Cumple</td><td><code>docs/MANUAL_USUARIO.md</code></td></tr>
+    <tr><td>Documentación técnica con tecnologías y código</td><td class="ok">Cumple</td><td><code>docs/MANUAL_TECNICO.md</code>, apartados 1 a 6 y 12</td></tr>
+    <tr><td>Presentación con roles, servicios, copias y monitorización</td><td class="ok">Cumple</td><td><code>docs/PRESENTACION.pptx</code>, diapositivas 4, 5 y 10 a 14</td></tr>
+    <tr><td>Planificación y reparto de tareas en la presentación</td><td class="ok">Cumple</td><td>Diapositiva 15 y apartado 6</td></tr>
+    <tr><td>Modelo E/R actualizado</td><td class="ok">Cumple</td><td>Apartado 4.3 y diapositivas 6 y 7</td></tr>
+    <tr><td>Bibliografía</td><td class="ok">Cumple</td><td>Apartado 8 y diapositiva 17</td></tr>
+    <tr><td>Declaración de IA con partes y prompts</td><td class="ok">Cumple</td><td>Apartado 9 y diapositiva 17</td></tr>
+    <tr><td>Número de reserva y PDF para el acceso</td><td class="ok">Cumple</td><td><code>public/reservation-pdf.php</code>, apartado 5.5</td></tr>
+    <tr><td>Aceptación de condiciones antes de confirmar</td><td class="ok">Cumple</td><td><code>public/condiciones.php</code>, columna <code>condiciones_aceptadas</code></td></tr>
+    <tr><td>Enlace o IP para probar la aplicación</td><td class="ok">Cumple</td><td>El despliegue con Docker del repositorio; en la VM, <code>https://127.0.0.1:8443</code></td></tr>
+  </tbody>
+</table>
+
+<div class="keep">
+<h2 id="s73">7.3 Límites conocidos</h2>
+<p>Estas cosas no están probadas o no están hechas, dichas antes de que las pregunte nadie.</p>
+
+<ul class="dense">
+  <li><b>El arranque en un equipo limpio y la restauración de una copia no se han ejecutado.</b>
+      La máquina virtual ya tenía las imágenes descargadas; el comando de restauración está
+      escrito y el fichero se genera, pero no se ha probado en un servidor aparte.</li>
+  <li><b>La pasarela de pago y el correo no existen.</b> Están fuera del alcance declarado y el
+      enunciado no los pide.</li>
+  <li><b>La auditoría no se ha probado con dos administradores a la vez</b>, ni las plazas se
+      añaden de una en una: se crean con el parking y se retiran.</li>
+</ul>
+
+<p>Ninguno de los tres límites afecta a lo que el enunciado pide, y los tres tienen una salida
+concreta. Se apuntan aquí para que no parezcan olvidos:</p>
+
+<ul class="dense">
+  <li><b>Arranque limpio:</b> se mide sobre un equipo sin imágenes en caché y se anota el tiempo
+      con <code>time docker compose up -d --build</code>.</li>
+  <li><b>Restauración:</b> se vuelca la copia en un contenedor MariaDB vacío y se compara el
+      número de filas de las once tablas con el original.</li>
+  <li><b>Concurrencia:</b> dos sesiones de administrador a la vez sobre la misma reserva, para
+      comprobar que la segunda recibe el aviso y no la sobrescribe.</li>
+</ul>
+
+<p>La lista de lo que se ha ejecutado de verdad, con su fecha y su resultado, está en
+<code>docs/VERIFICACION-SPRINT2.md</code>; este apartado es la otra cara de esa lista.</p>
+</div>
+
+<!-- ===================== 8 ===================== -->
+<h1 class="section" id="s8">8. Bibliografía</h1>
+
+<p>Todo lo que sigue se ha consultado durante el sprint y se puede abrir. Las referencias están
+agrupadas por para qué se usaron, no por orden alfabético.</p>
+
+<h3>Documentación del lenguaje y de la base de datos</h3>
+<ul class="dense">
+  <li>PHP Documentation Group. <i>Manual de PHP: PDO</i>. https://www.php.net/manual/es/book.pdo.php</li>
+  <li>PHP Documentation Group. <i>Manual de PHP: password_hash</i>. https://www.php.net/manual/es/function.password-hash.php</li>
+  <li>PHP Documentation Group. <i>Manual de PHP: Sesiones</i>. https://www.php.net/manual/es/book.session.php</li>
+  <li>MariaDB Foundation. <i>CREATE TRIGGER</i>. https://mariadb.com/kb/en/create-trigger/</li>
+  <li>MariaDB Foundation. <i>Foreign Keys</i>. https://mariadb.com/kb/en/foreign-keys/</li>
+  <li>MariaDB Foundation. <i>InnoDB Transactions and Locking</i>. https://mariadb.com/kb/en/innodb-locking/</li>
+  <li>Oracle. <i>MySQL 8.0 Reference Manual: CHECK Constraints</i>. https://dev.mysql.com/doc/refman/8.0/en/create-table-check-constraints.html</li>
+</ul>
+
+<h3>Despliegue y servicios</h3>
+<ul class="dense">
+  <li>Docker Inc. <i>Compose file reference</i>. https://docs.docker.com/compose/compose-file/</li>
+  <li>Docker Inc. <i>docker compose up</i>. https://docs.docker.com/reference/cli/docker/compose/up/</li>
+  <li>Apache Software Foundation. <i>Apache HTTP Server 2.4: SSL/TLS Strong Encryption</i>. https://httpd.apache.org/docs/2.4/ssl/</li>
+  <li>Apache Software Foundation. <i>mod_rewrite</i>. https://httpd.apache.org/docs/2.4/mod/mod_rewrite.html</li>
+  <li>phpMyAdmin Project. <i>phpMyAdmin Documentation</i>. https://docs.phpmyadmin.net/</li>
+  <li>OpenSSL Project. <i>openssl-req(1)</i>. https://docs.openssl.org/master/man1/openssl-req/</li>
+</ul>
+
+<h3>Monitorización</h3>
+<ul class="dense">
+  <li>Prometheus Authors. <i>Configuration</i>. https://prometheus.io/docs/prometheus/latest/configuration/configuration/</li>
+  <li>Prometheus Authors. <i>Instrumentation: exposition formats</i>. https://prometheus.io/docs/instrumenting/exposition_formats/</li>
+  <li>Grafana Labs. <i>Provisioning Grafana</i>. https://grafana.com/docs/grafana/latest/administration/provisioning/</li>
+  <li>Google. <i>cAdvisor</i>. https://github.com/google/cadvisor</li>
+</ul>
+
+<h3>Seguridad</h3>
+<ul class="dense">
+  <li>OWASP Foundation. <i>Cross-Site Request Forgery Prevention Cheat Sheet</i>. https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html</li>
+  <li>OWASP Foundation. <i>SQL Injection Prevention Cheat Sheet</i>. https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html</li>
+  <li>OWASP Foundation. <i>Password Storage Cheat Sheet</i>. https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html</li>
+  <li>MDN Web Docs. <i>Set-Cookie</i>. https://developer.mozilla.org/es/docs/Web/HTTP/Headers/Set-Cookie</li>
+</ul>
+
+<h3>Formato PDF</h3>
+<ul class="dense">
+  <li>ISO. <i>ISO 32000-1:2008. Document management. Portable Document Format</i>. https://www.iso.org/standard/51502.html</li>
+  <li>Adobe. <i>PDF Reference 1.7</i>. https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/pdfreference1.7old.pdf</li>
+</ul>
+
+<h3>Material del curso</h3>
+<ul class="dense">
+  <li>Moodle ViB, curso 0379. <i>Enunciat del projecte 1. Parkings</i> (página 35397 del curso).</li>
+  <li>Moodle ViB, curso 0379. <i>SPRINT 1 (Projecte1)</i> y <i>SPRINT 2 (Implementació)</i> (tareas 52194 y 84743).</li>
+  <li>Grupo 6. <i>Sistema de Reservas de Parking para Tarragona. Sprint 1</i>. Documento de presentación, curso 2026-2027.</li>
+  <li>Grupo 6. <i>Guía interna del Sprint 2</i>. <code>Projecte/Projecte Sprint2/instruccions.txt</code>.</li>
+</ul>
+
+<!-- ===================== 9 ===================== -->
+<h1 class="section" id="s9">9. Declaración de uso de IA</h1>
+
+<p>La IA se ha usado como herramienta de apoyo, tal como pide el enunciado. Aquí queda qué
+agente, qué modelo, qué partes y con qué instrucciones. No hay un modelo por defecto: cada
+sesión se registra con el que se usó de verdad.</p>
+
+<h2>9.1 Herramientas y reparto</h2>
+<table class="data">
+  <thead><tr><th style="width:24%">Fase</th><th style="width:20%">Herramienta</th><th>Qué se hizo con ella</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Sprint 1</td>
+      <td><code>opencode</code> con <code>SpaceBunnyFree</code></td>
+      <td>Redacción del documento de presentación y de las presentaciones del Sprint 1</td>
+    </tr>
+    <tr>
+      <td>Desarrollo del Sprint 2<br>(9 a 26 de octubre)</td>
+      <td>Sesiones de agente sin modelo registrado en el repositorio</td>
+      <td>Estructura del proyecto, clases de dominio, vistas, pruebas y manuales. El detalle de
+          lo que se corrigió está en <code>docs/INCIDENCIAS.md</code>, que no anota el modelo</td>
+    </tr>
+    <tr>
+      <td>Cierre del 28 de octubre</td>
+      <td><code>codewhale</code> con <code>deepseek-v4-flash</code></td>
+      <td>Resguardo PDF, condiciones de la reserva, revisión cruzada de la documentación,
+          corrección de cifras, este documento y la actualización de la presentación</td>
+    </tr>
+    <tr>
+      <td>Revisión final del 29 de octubre</td>
+      <td><code>codewhale</code>; el modelo de esta sesión no quedó registrado</td>
+      <td>Contraste de cada cifra contra el árbol, estado real de la planificación,
+          mapa del código del manual técnico y regeneración del documento, la presentación y el ZIP</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="note warn">
+  <b>Lo que no se puede afirmar no se afirma.</b> Las sesiones del 21 al 26 de octubre no
+  dejaron registrado el modelo que se estaba usando, así que aquí no se le pone nombre. Si al
+  revisar el historial aparece, se añade: la declaración es un registro, no una plantilla.
+</div>
+
+<h2>9.2 Qué partes son de la IA y qué partes no</h2>
+<table class="data">
+  <thead><tr><th style="width:44%">Parte</th><th>Quién la ha hecho</th></tr></thead>
+  <tbody>
+    <tr><td>Idea del proyecto, alcance y decisiones de negocio</td><td>El grupo. La IA no decidió qué se construye</td></tr>
+    <tr><td>Diseño del modelo de datos y de los casos de uso</td><td>El grupo, con la IA como revisora</td></tr>
+    <tr><td>Código PHP, SQL, HTML y CSS</td><td>Escrito con la IA a partir de las decisiones del grupo, y revisado línea a línea antes de darlo por bueno</td></tr>
+    <tr><td>Pruebas automáticas</td><td>Escritas con la IA, ejecutadas y leídas por el grupo</td></tr>
+    <tr><td>Manuales y este documento</td><td>Redactados con la IA a partir de datos comprobados en el repositorio</td></tr>
+    <tr><td>Presentación y vídeo</td><td>Generador escrito con la IA; el vídeo se grabó contra la aplicación real</td></tr>
+    <tr><td>Verificación final</td><td>Ejecutada en la máquina virtual. Las cifras del apartado 7 son salida de las pruebas, no estimaciones</td></tr>
+  </tbody>
+</table>
+
+<h2>9.3 Prompts utilizados</h2>
+<p>Los enunciados están resumidos, pero conservan lo que se pidió y las condiciones. Todos
+incluyen la misma restricción: no inventar resultados.</p>
+
+<ol>
+  <li><b>Auditoría del código contra el enunciado.</b><br>
+      «Comprueba en el código real, no en la documentación, qué está implementado y qué no, con
+      evidencia <code>ruta:línea</code>. Revisa roles, registro, reserva con precio, PDF de la
+      reserva, aceptación de condiciones, control de acceso, panel de administración y
+      monitorización. Si algo no se puede probar, dilo como no probado en vez de suponerlo.»</li>
+  <li><b>Revisión de coherencia de la documentación.</b><br>
+      «Compara cada cifra que afirma la documentación con el código y la base de datos reales:
+      tablas, claves foráneas, filas de semilla, contenedores, archivos, consultas, número de
+      comprobaciones de cada prueba y puertos. Marca cada discrepancia con el valor real y la
+      línea donde está.»</li>
+  <li><b>Resguardo PDF sin dependencias.</b><br>
+      «El enunciado pide un PDF de la reserva. El contenedor no tiene librería de PDF ni red para
+      instalarla. Escribe un generador mínimo que produzca un PDF válido con tildes, euro,
+      alineación de importes a la derecha y varias páginas, y pruébalo antes de conectarlo a la
+      aplicación.»</li>
+  <li><b>Aceptación de condiciones.</b><br>
+      «Añade la aceptación de condiciones como requisito del servidor, no solo del formulario:
+      una casilla, una página con el texto y una marca de tiempo en la reserva. Comprueba que un
+      POST sin la casilla no crea nada.»</li>
+  <li><b>Documento de presentación.</b><br>
+      «Redacta el documento de presentación del Sprint 2 en castellano, con la planificación
+      actualizada, el Gantt, el modelo E/R, la bibliografía y la declaración de IA. Los datos
+      tienen que salir del repositorio; si falta un dato, se deja dicho, no se rellena.»</li>
+</ol>
+
+<p>El registro de lo corregido, con fecha y motivo, está en <code>docs/INCIDENCIAS.md</code> y
+<code>docs/DECISIONES-SPRINT2.md</code>.</p>
+
+<!-- ===================== ANEXO A ===================== -->
+<h1 class="section" id="sa">Anexo A. Capturas de la aplicación</h1>
+
+<p>Las capturas son reales, hechas sobre la aplicación en marcha y revisadas una a una contra lo
+que dicen los pies. Las del 23 de octubre salen del framebuffer de la máquina virtual; las tres
+últimas se tomaron el 28 de octubre conduciendo Chrome contra el puerto reenviado.</p>
+
+<div class="shots tres">
+  <figure><img src="img/captura-02-login.png" alt="Inicio de sesión de cliente">
+    <figcaption><b>A.1.</b> Inicio de sesión de cliente, con las cuentas de prueba a la derecha.</figcaption></figure>
+  <figure><img src="img/captura-03-panel-cliente.png" alt="Panel del cliente">
+    <figcaption><b>A.2.</b> Panel del cliente: reservas activas, vehículos y próxima reserva.</figcaption></figure>
+  <figure><img src="img/captura-04-mis-reservas.png" alt="Historial de reservas">
+    <figcaption><b>A.3.</b> Mis reservas con los estados: activa, en curso, con exceso y finalizada.</figcaption></figure>
+  <figure><img src="img/captura-05-nueva-reserva.png" alt="Formulario de reserva vacío">
+    <figcaption><b>A.4.</b> Formulario de reserva antes de elegir parking ni fechas.</figcaption></figure>
+  <figure><img src="img/captura-06-control-acceso.png" alt="Control de acceso">
+    <figcaption><b>A.5.</b> Control de acceso: matrícula tecleada y últimos movimientos.</figcaption></figure>
+  <figure><img src="img/captura-20-condiciones.png" alt="Condiciones de la reserva">
+    <figcaption><b>A.6.</b> Condiciones de la reserva, públicas y enlazadas desde el formulario.</figcaption></figure>
+  <figure><img src="img/captura-09-acceso-autorizado.png" alt="Entrada autorizada">
+    <figcaption><b>A.7.</b> Entrada autorizada: plaza asignada y reserva en curso.</figcaption></figure>
+  <figure><img src="img/captura-10-acceso-denegado.png" alt="Entrada denegada">
+    <figcaption><b>A.8.</b> Entrada denegada por matrícula desconocida, con el motivo y la traza.</figcaption></figure>
+  <figure><img src="img/captura-11-salida-exceso.png" alt="Salida con exceso">
+    <figcaption><b>A.9.</b> Salida con dos horas de exceso y su importe cobrado aparte.</figcaption></figure>
+  <figure><img src="img/captura-17-admin-parkings.png" alt="Ficha de parking">
+    <figcaption><b>A.10.</b> Ficha de parking con sus plazas y sus tarifas.</figcaption></figure>
+  <figure><img src="img/captura-18-auditoria.png" alt="Auditoría">
+    <figcaption><b>A.11.</b> Auditoría del panel: quién, qué tabla, qué acción y cuándo.</figcaption></figure>
+  <figure><img src="img/captura-19-perfil.png" alt="Perfil del cliente">
+    <figcaption><b>A.12.</b> Perfil del cliente con el método de pago tokenizado.</figcaption></figure>
+  <figure><img src="img/captura-15-prometheus.png" alt="Objetivos de Prometheus">
+    <figcaption><b>A.13.</b> Los cuatro objetivos de Prometheus en estado <code>UP</code>.</figcaption></figure>
+  <figure><img src="img/captura-16-phpmyadmin.png" alt="phpMyAdmin con las once tablas">
+    <figcaption><b>A.14.</b> phpMyAdmin con las once tablas del modelo y sus filas.</figcaption></figure>
+</div>
+
+<!-- ===================== ANEXO B ===================== -->
+<h1 class="section" id="sb">Anexo B. Guion de la exposición</h1>
+
+<p>La exposición dura diez minutos y sigue el orden de la presentación. Cada fila es una
+diapositiva, con lo que se proyecta y lo que se dice. El vídeo cubre la demo para no depender de
+que la red funcione el día de la presentación.</p>
+
+<table class="data compact fluida">
+  <thead><tr><th style="width:6%">#</th><th style="width:26%">Qué se proyecta</th><th>Qué se dice</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Portada</td><td>Somos el grupo 6. En el Sprint 1 presentamos el diseño; en el Sprint 2, la aplicación que funciona.</td></tr>
+    <tr><td>2</td><td>Qué cambia</td><td>No hemos empezado de cero: el modelo aprobado es la base. Lo que cambia es que ahora hay código, base de datos y contenedores.</td></tr>
+    <tr><td>3</td><td>Alcance: solo software</td><td>Retiramos todo el hardware, como pidió el profesorado. El control de acceso es una simulación y lo explicamos aquí para que no parezca que falta.</td></tr>
+    <tr><td>4</td><td>Los tres roles</td><td>Cliente, administrador y operador. Cada uno tiene su sesión y sus permisos, y se comprueban en el servidor.</td></tr>
+    <tr><td>5</td><td>Arquitectura</td><td>Siete contenedores en dos ficheros de Compose. Todo se levanta con un comando.</td></tr>
+    <tr><td>6</td><td>Once entidades</td><td>El modelo no es un listado de tablas: cada bloque tiene una responsabilidad.</td></tr>
+    <tr><td>7</td><td>Las quince relaciones</td><td>Esta es la diapositiva que responde a la segunda indicación: las conexiones y las cardinalidades.</td></tr>
+    <tr><td>8</td><td>Decisiones del modelo</td><td>Cada cambio respecto al Sprint 1 tiene un motivo, no es una preferencia.</td></tr>
+    <tr><td>9</td><td>Integridad</td><td>La garantía está en la base de datos: un <code>DELETE</code> de reserva se rechaza.</td></tr>
+    <tr><td>10</td><td>Flujo de reserva</td><td>La plaza se bloquea con <code>FOR UPDATE</code>: dos clientes no reciben la misma.</td></tr>
+    <tr><td>11</td><td>Precio, exceso y resguardo</td><td>Horas completas o fracción, 10 % de gestión, y un PDF con el código de acceso.</td></tr>
+    <tr><td>12</td><td>Control de acceso</td><td>Entrada, salida y denegación con motivo. Todo queda registrado.</td></tr>
+    <tr><td>13</td><td>Panel de administración</td><td>No puede borrar reservas: modifica y cancela. La traza se escribe desde diez puntos del código.</td></tr>
+    <tr><td>14</td><td>Monitorización</td><td>Prometheus recoge y Grafana enseña, con métricas de negocio leídas de MariaDB.</td></tr>
+    <tr><td>15</td><td>Planificación y Gantt</td><td>Dieciséis tareas, tres responsables y una tarea retirada por la indicación del profesorado.</td></tr>
+    <tr><td>16</td><td>Verificación</td><td>19/19 dentro de la VM, 53/53 desde el portátil, y decimos dónde se hizo cada cosa.</td></tr>
+    <tr><td>17</td><td>Bibliografía e IA</td><td>Las fuentes, y la declaración de qué se hizo con IA y con qué prompts.</td></tr>
+    <tr><td>18</td><td>Cierre</td><td>La aplicación está construida, arrancada y probada. El vídeo enseña el recorrido completo.</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <b>Si falla la red el día de la exposición.</b> El vídeo y la presentación están en el mismo
+  equipo y no dependen de la máquina virtual. La demo en vivo es un extra, no el soporte de la
+  exposición.
+</div>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+# Credenciales y certificados: nunca al repositorio.
+.env
+
+# Certificados autofirmados: se generan en el arranque.
+certs/*.crt
+certs/*.key
+certs/*.pem
+
+# Justificantes subidos por los usuarios.
+app/public/uploads/*
+!app/public/uploads/.gitkeep
+
+# Copias de seguridad generadas por scripts/backup.sh
+backups/*.sql
+backups/*.gz
+
+# Basura del sistema y de los editores.
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+node_modules/
+vendor/
+
+# Caché de Python de los tests
+__pycache__/
+*.pyc

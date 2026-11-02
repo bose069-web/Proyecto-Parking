@@ -157,6 +157,7 @@ Núcleo del sistema. Guarda la franja prevista, la franja real, el estado y el p
 | importe_total | DECIMAL(10,2) | | No | Suma de los dos anteriores |
 | importe_exceso | DECIMAL(10,2) | | No | Cobro adicional por retraso |
 | observaciones | VARCHAR(255) | | Sí | Notas |
+| condiciones_aceptadas | DATETIME | | Sí | Marca de tiempo de la aceptación; se guarda cuándo, no solo si |
 | fecha_creacion | DATETIME | | No | Alta |
 
 Los tres importes se congelan al crear la reserva. Si mañana sube la tarifa, la reserva de ayer conserva su precio. Es una redundancia deliberada y se explica en el apartado 7.
@@ -326,7 +327,7 @@ La alternativa sería guardar una tarifa versionada y reconstruir el precio, per
 
 ## 7. Ciclo de vida de la reserva
 
-Siete estados y nueve transiciones permitidas:
+Siete estados y siete transiciones permitidas:
 
 ```
 PENDIENTE_PAGO ──► ACTIVA ──► EN_CURSO ──► FINALIZADA
@@ -418,5 +419,10 @@ php tests/pricing_test.php
 # Diagramas, a partir de la definición del modelo
 node tools/gen-modelo.mjs
 ```
+
+`gen-modelo.mjs` no trae su propio motor de dibujo: usa el Graphviz que ya está
+instalado en `Projecte1-Sprint1/treball/node_modules/`. Por eso hay que ejecutarlo
+desde el árbol completo del SSD y no desde esta carpeta suelta. Los diagramas ya
+generados viven en `docs/img/`, así que sólo hace falta si cambia el modelo.
 
 `check_schema.py` no sustituye a arrancar MariaDB, pero detecta lo que un error de tecleo rompe en silencio: una clave foránea que apunta a una tabla inexistente, un índice sobre una columna que no existe o un `INSERT` con una columna inventada. Cuando el stack esté levantado, `scripts/smoke-test.sh` comprueba además que los importes de las 20 reservas cuadran con su tarifa y que el trigger de borrado actúa.

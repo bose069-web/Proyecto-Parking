@@ -53,8 +53,54 @@ final class Reservation
             throw new DomainException('La reserva no puede durar más de 30 días.');
         }
 
+        // Aceptar las condiciones es obligatorio y se comprueba aquí, no solo en
+        // el formulario: el POST se puede fabricar a mano. Va después de validar
+        // los datos para que el primer error que vea el cliente sea el suyo.
+        if ((string) ($data['condiciones'] ?? '') !== '1') {
+            throw new DomainException('Tienes que aceptar las condiciones de la reserva para continuar.');
+        }
+
         return Database::transaction(function (PDO $pdo) use ($idCliente, $parking, $vehiculo, $entrada, $salida, $data): int {
             $tipos = Parking::tiposCompatibles((string) $vehiculo['tipo_vehiculo']);
+
+            // Un vehículo no puede estar en dos reservas vivas a la vez: al llegar
+            // solo podría entrar con una, la otra se quedaría sin usar y ya cobrada.
+            //
+            // Comprobar antes de insertar no basta: entre el SELECT y el INSERT cabe
+            // otra petición del mismo coche. Por eso se bloquea primero la fila del
+            // vehículo con FOR UPDATE; la segunda petición espera aquí hasta que la
+            // primera confirme o deshaga, y cuando llega a la comprobación ya ve el
+            // resultado de la otra. Mismo razonamiento que en plazaDisponible().
+            $pdo->prepare('SELECT id_vehiculo FROM VEHICULO WHERE id_vehiculo = :vehiculo FOR UPDATE')
+                ->execute(['vehiculo' => (int) $vehiculo['id_vehiculo']]);
+
+            // La condición de los 15 minutos es la misma que usa plazaDisponible():
+            // una reserva abandonada en el pago no ocupa plaza y tampoco debe
+            // bloquear al cliente que quiere volver a intentarlo.
+            $bloqueo = max(1, min(1440, (int) app_config('business.bloqueo_pendiente', 15)));
+
+            $choque = $pdo->prepare(
+                "SELECT codigo_reserva
+                   FROM RESERVA
+                  WHERE id_vehiculo = :vehiculo
+                    AND estado IN ('PENDIENTE_PAGO','ACTIVA','EN_CURSO')
+                    AND fecha_hora_entrada_prevista < :hasta
+                    AND fecha_hora_salida_prevista  > :desde
+                    AND (estado <> 'PENDIENTE_PAGO'
+                         OR fecha_creacion > NOW() - INTERVAL {$bloqueo} MINUTE)
+                  LIMIT 1"
+            );
+            $choque->execute([
+                'vehiculo' => (int) $vehiculo['id_vehiculo'],
+                'desde'    => $entrada,
+                'hasta'    => $salida,
+            ]);
+            $ocupada = $choque->fetchColumn();
+            if ($ocupada !== false) {
+                throw new DomainException(
+                    'Ese vehículo ya tiene la reserva ' . $ocupada . ' en esa franja horaria.'
+                );
+            }
 
             $plaza = Parking::plazaDisponible(
                 (int) $parking['id_parking'],
@@ -97,12 +143,12 @@ final class Reservation
                     (id_cliente, id_vehiculo, id_parking, id_plaza, id_tarifa, codigo_reserva,
                      fecha_hora_entrada_prevista, fecha_hora_salida_prevista,
                      estado, importe_base, importe_gestion, importe_total, importe_exceso,
-                     observaciones, fecha_creacion)
+                     observaciones, condiciones_aceptadas, fecha_creacion)
                  VALUES
                     (:cliente, :vehiculo, :parking, :plaza, :tarifa, :codigo,
                      :entrada, :salida,
                      :estado, :base, :gestion, :total, 0.00,
-                     :observaciones, NOW())'
+                     :observaciones, NOW(), NOW())'
             );
             $stmt->execute([
                 'cliente'       => $idCliente,
@@ -260,8 +306,9 @@ final class Reservation
      * Cancela las reservas que se quedaron a medias en el pago.
      * Sin esto, una reserva abandonada bloquearía su plaza para siempre.
      */
-    public static function expirarPendientes(int $minutos = 15): int
+    public static function expirarPendientes(?int $minutos = null): int
     {
+        $minutos ??= (int) app_config('business.bloqueo_pendiente', 15);
         $minutos = max(1, min(1440, $minutos));
 
         return Database::transaction(function (PDO $pdo) use ($minutos): int {
@@ -420,6 +467,30 @@ final class Reservation
                 if ($stmt->fetchColumn()) {
                     throw new DomainException('La plaza elegida ya está ocupada en esa franja.');
                 }
+            }
+
+            // Y tampoco puede quedar el mismo coche en dos reservas vivas: al mover
+            // las fechas se puede crear el solape sin tocar la plaza. Se excluye la
+            // propia reserva, que es la que se está editando.
+            $stmt = $pdo->prepare(
+                "SELECT codigo_reserva FROM RESERVA
+                  WHERE id_vehiculo = :vehiculo AND id_reserva <> :id
+                    AND estado IN ('PENDIENTE_PAGO','ACTIVA','EN_CURSO')
+                    AND fecha_hora_entrada_prevista < :salida
+                    AND fecha_hora_salida_prevista > :entrada
+                  LIMIT 1"
+            );
+            $stmt->execute([
+                'vehiculo' => (int) $reserva['id_vehiculo'],
+                'id'       => $id,
+                'salida'   => $salida,
+                'entrada'  => $entrada,
+            ]);
+            $choque = $stmt->fetchColumn();
+            if ($choque !== false) {
+                throw new DomainException(
+                    'Ese vehículo ya tiene la reserva ' . $choque . ' en esa franja horaria.'
+                );
             }
 
             $tarifa = $pdo->prepare('SELECT * FROM TARIFA WHERE id_tarifa = :id');

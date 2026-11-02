@@ -145,6 +145,10 @@ final class Parking
 
         $in = implode(', ', $marcadores);
 
+        // Minutos que una reserva abandonada en el pago sigue ocupando su plaza.
+        // Sale de config.php y se acota a un entero, porque se interpola.
+        $bloqueo = max(1, min(1440, (int) app_config('business.bloqueo_pendiente', 15)));
+
         $sql = "SELECT p.*
                   FROM PLAZA p
                  WHERE p.id_parking = :parking
@@ -159,7 +163,7 @@ final class Parking
                           AND r.fecha_hora_salida_prevista > :desde
                           AND (
                               r.estado <> 'PENDIENTE_PAGO'
-                              OR r.fecha_creacion > NOW() - INTERVAL 15 MINUTE
+                              OR r.fecha_creacion > NOW() - INTERVAL {$bloqueo} MINUTE
                           )
                    )
                  ORDER BY p.id_plaza

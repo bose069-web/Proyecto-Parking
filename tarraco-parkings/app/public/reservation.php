@@ -45,6 +45,8 @@ if (isset($_GET['id'])) {
         </div>
         <div>
             <a class="btn btn-ghost btn-small" href="/my-reservations.php">Volver</a>
+            <a class="btn btn-ghost btn-small" href="/reservation-pdf.php?id=<?= (int) $reserva['id_reserva'] ?>"
+               target="_blank" rel="noopener">Resguardo PDF</a>
             <button class="btn btn-ghost btn-small" type="button" onclick="window.print()">Imprimir</button>
         </div>
     </div>
@@ -204,6 +206,17 @@ render_header('Nueva reserva', 'reservas');
                     <div class="field field-full">
                         <label for="observaciones">Observaciones <span class="hint">(opcional)</span></label>
                         <textarea id="observaciones" name="observaciones" rows="2" maxlength="255"><?= e($valores['observaciones']) ?></textarea>
+                    </div>
+
+                    <div class="field field-full">
+                        <label class="check">
+                            <input type="checkbox" name="condiciones" value="1" required
+                                <?= ($_POST['condiciones'] ?? '') === '1' ? 'checked' : '' ?>>
+                            <span>He leído y acepto las
+                                <a href="/condiciones.php" target="_blank" rel="noopener">condiciones de la reserva</a>:
+                                franja horaria, margen de 30 minutos para entrar y cobro del exceso
+                                con el mismo método de pago.</span>
+                        </label>
                     </div>
                 </div>
 

@@ -5,9 +5,12 @@ require_once __DIR__ . '/../src/bootstrap.php';
 
 // El simulador escribe en RESERVA, PLAZA y PAGO: exige sesión. Un cliente
 // puede usarlo para sus propios movimientos; el administrador, para cualquiera.
-if (Auth::cliente() === null && Auth::admin() === null) {
-    flash('warning', 'Inicia sesión para usar el control de acceso.');
-    redirect('/login.php');
+// checkAuth() y no solo "hay sesión": es lo que revalida contra la base que la
+// cuenta siga ACTIVA, de modo que dar de baja a un cliente corta también aquí.
+if (Auth::admin() !== null) {
+    Auth::checkAdmin();
+} else {
+    Auth::checkAuth();
 }
 
 $parkings  = Parking::allActive();
@@ -111,7 +114,7 @@ render_header('Control de acceso', 'acceso');
             <?php if ($resultado['reserva'] !== null): ?>
                 <dl class="dl">
                     <div><dt>Reserva</dt><dd class="mono"><?= e($resultado['reserva']['codigo_reserva']) ?></dd></div>
-                    <div><dt>Estado</dt><dd><span class="badge badge-<?= e($resultado['reserva']['estado']) ?>"><?= e($resultado['reserva']['estado']) ?></span></dd></div>
+                    <div><dt>Estado</dt><dd><span class="badge badge-<?= e($resultado['reserva']['estado']) ?>"><?= e(etiqueta_estado($resultado['reserva']['estado'])) ?></span></dd></div>
                     <div><dt>Entrada prevista</dt><dd><?= fecha($resultado['reserva']['fecha_hora_entrada_prevista']) ?></dd></div>
                     <div><dt>Salida prevista</dt><dd><?= fecha($resultado['reserva']['fecha_hora_salida_prevista']) ?></dd></div>
                 </dl>

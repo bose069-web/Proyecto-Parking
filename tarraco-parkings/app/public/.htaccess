@@ -1,0 +1,29 @@
+# Redirección a HTTPS. El VirtualHost ya la hace en el puerto 80; esta regla
+# cubre el caso de servir la aplicación detrás de un proxy.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Las rutas que no son archivos ni directorios existentes no se inventan:
+    # la aplicación usa URLs con .php explícito. Sin sustitución, Apache
+    # devuelve el 404 normal.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ - [L]
+</IfModule>
+
+# Nada de listados de directorio.
+Options -Indexes
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Los justificantes y los archivos de configuración no se sirven como texto.
+<FilesMatch "\.(sql|md|ini|log|env)$">
+    Require all denied
+</FilesMatch>

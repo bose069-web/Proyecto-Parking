@@ -65,7 +65,7 @@ La guía `Projecte/Projecte Sprint2/instruccions.txt` no es el enunciado de Mood
 4. **«UC-01 a UC-22».** El Sprint 1 documenta 31 casos de uso, no 22. No se ha inventado una renumeración; el Sprint 2 se prueba por flujos funcionales.
 5. **Estados mezclados y una errata.** La guía escribe `PENDENT_PAGAMENT`, `CANCEL_LADA`, `AMB_EXCES` y `NO_PRESENTADA`. `CANCEL_LADA` es `CANCELADA` con un guion bajo de más. En el proyecto los estados van en español y sin erratas.
 6. **`barrera_oberta` en `REGISTRE_ACCES`.** Contradice la indicación de los profesores. Se elimina.
-7. **Vencimiento del 22/11/2026 sin confirmar.** La guía lo da como fecha, pero no se ha podido leer Moodle desde este entorno. **No se debe tratar como confirmado** hasta abrirlo en el curso.
+7. **Vencimiento del 22/11/2026.** La guía lo daba como fecha y el 26/10/2026 se confirmó en Moodle: la tarea es la **84743** y el vencimiento es el **22/11/2026 a las 00:00**. Queda por tanto verificado, no supuesto (vegeu el apartado 5).
 8. **Orden de arranque de la monitorización.** La guía propone `docker-compose -f docker-compose.monitor.yml up -d` solo. El archivo de monitorización se une a la red del stack principal, así que primero hay que levantar `docker compose up -d`.
 
 ---
@@ -87,17 +87,20 @@ Se hizo una revisión estática completa del código. Encontró un defecto que h
 
 ## 5. Lo que se ha verificado y lo que sigue abierto
 
-- **El stack se ha arrancado de verdad en una VM Ubuntu 24.04.5** (`sprint2-ubuntu`, VirtualBox), porque el equipo del aula no tiene Docker ni MariaDB. Dentro de la VM, `scripts/smoke-test.sh` pasa **18/18**. Desde el portátil, contra el puerto reenviado 8443, `tests/e2e_client.py` pasó **37/37** el 21/10/2026 y **41/41** el 23/10/2026, tres veces seguidas: registro de una cuenta nueva, alta de vehículo, login, CSRF, reserva con precio, entrada, salida, aislamiento entre clientes y panel de administración.
-- **Las capturas son framebuffer real de la VM.** Hay siete en `docs/img/`; faltan las de Grafana, Prometheus y phpMyAdmin.
-- **La fecha de entrega y el identificador de la tarea en Moodle siguen sin confirmar.** Sin sesión del curso no se han podido leer.
-- **El Sprint 1 sigue pendiente de la captura de Trello.** Es un asunto distinto y no se ha tocado aquí.
+- **El stack se ha arrancado de verdad en una VM Ubuntu 24.04.5** (`sprint2-ubuntu`, VirtualBox), porque el equipo del aula no tiene Docker ni MariaDB. Dentro de la VM, `scripts/smoke-test.sh` pasa **19/19** (última medida: 29/10/2026, con la base recreada desde cero después de las cuatro correcciones de código). Desde el portátil, contra el puerto reenviado 8443, `tests/e2e_client.py` pasa **53/53**: registro de una cuenta nueva, alta de vehículo, login, CSRF, reserva con precio, resguardo PDF, entrada, salida, aislamiento entre clientes y panel de administración.
+- **Las capturas son framebuffer real de la VM.** Hay **22** en `docs/img/`: las diecinueve de la aplicación, más condiciones, formulario con la casilla y resguardo PDF, tomadas el 28/10.
+- **La fecha de entrega y el identificador de la tarea están confirmados**: SPRINT 2 (Implementació) es la tarea **84743** del curso 184 y el vencimiento es el **22/11/2026 a las 00:00**.
+- **El Sprint 1 sigue pendiente de tramitar.** Es un asunto distinto y no se ha tocado aquí.
 
 ---
 
 ## 6. Qué falta para cerrar el Sprint 2
 
-1. Completar las capturas que faltan: Grafana con datos, Prometheus con los targets en `UP` y phpMyAdmin con las tablas.
-2. Incorporar las capturas a los manuales y a la presentación.
-3. Confirmar en Moodle la fecha, el identificador de tarea y los adjuntos del Sprint 2.
-4. Revisar si el profesorado quiere el repositorio Git o un ZIP.
-5. Preparar el vídeo de 5 a 10 minutos, si se pide.
+**Solo queda la tramesa en Moodle.** Las tres decisiones que estaban abiertas ya están tomadas:
+
+1. **Formato:** ZIP, no repositorio Git. La guía admite las dos cosas y el ZIP es lo que se ha verificado extrayéndolo en una carpeta limpia.
+2. **Vídeo:** se queda el screencast con rótulos, sin narración. Dura 5 min 38 s, entra en el rango de 5 a 10 minutos y enseña la aplicación real, que es lo que pide el enunciado.
+3. **Tramesa:** ZIP, `PRESENTACION.pdf`, `DOCUMENTO-PRESENTACION.pdf` y el enlace de prueba (`docker compose up -d` → `https://localhost`; en el aula, la VM en `https://127.0.0.1:8443`).
+
+La revisión final del 29/10/2026 volvió a pasar las dos suites con la base recreada (19/19 y 53/53), contrastó cada cifra contra el árbol y regeneró el documento, la presentación y el ZIP.
+Lo que en la revisión del 21 de octubre aparecía como pendiente (capturas de Grafana, Prometheus y phpMyAdmin; fecha y tarea de Moodle; vídeo) está resuelto desde entonces.

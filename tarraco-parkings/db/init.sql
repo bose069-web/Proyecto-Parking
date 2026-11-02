@@ -172,6 +172,9 @@ CREATE TABLE RESERVA (
   importe_total                 DECIMAL(10,2)   NOT NULL,
   importe_exceso                DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
   observaciones                 VARCHAR(255)        NULL,
+  -- Prueba de que el cliente aceptó las condiciones antes de confirmar. Se
+  -- guarda la marca de tiempo, no un booleano: así se sabe cuándo y no solo si.
+  condiciones_aceptadas         DATETIME            NULL,
   fecha_creacion                DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id_reserva),
   UNIQUE KEY uq_reserva_codigo (codigo_reserva),
@@ -533,7 +536,7 @@ INSERT INTO PAGO
   (id_pago, id_reserva, id_metodo_pago, tipo_pago, importe, estado, fecha_hora, referencia_transaccion)
 VALUES
   ( 1,  1,  1, 'RESERVA',  7.92, 'CONFIRMADO', NOW() - INTERVAL 2 HOUR,  'TX-0001'),
-  ( 2,  2,  2, 'RESERVA', 15.84, 'CONFIRMADO', NOW() - INTERVAL 1 DAY,   'TX-0002'),
+  ( 2,  2,  2, 'RESERVA',  7.92, 'CONFIRMADO', NOW() - INTERVAL 1 DAY,   'TX-0002'),
   ( 3,  3,  3, 'RESERVA',  3.96, 'CONFIRMADO', NOW() - INTERVAL 2 DAY,   'TX-0003'),
   ( 4,  4,  4, 'RESERVA',  6.60, 'CONFIRMADO', NOW() - INTERVAL 1 DAY,   'TX-0004'),
   ( 5,  5,  5, 'RESERVA',  6.60, 'CONFIRMADO', NOW() - INTERVAL 2 DAY,   'TX-0005'),
@@ -595,6 +598,10 @@ VALUES
    JSON_OBJECT('estado', 'ACTIVA'),
    JSON_OBJECT('estado', 'CANCELADA', 'motivo', 'Petición del cliente'),
    NOW() - INTERVAL 5 DAY, '172.18.0.1');
+
+-- Las reservas de ejemplo se crearon aceptando las condiciones: sin esa marca
+-- el resguardo de las reservas sembradas diría que no consta, que es falso.
+UPDATE RESERVA SET condiciones_aceptadas = fecha_creacion;
 
 -- =====================================================================
 --  GARANTÍAS EN LA BASE DE DATOS

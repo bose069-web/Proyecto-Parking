@@ -12,16 +12,35 @@
  *   docs/img/modelo-er.svg            vista de relaciones y cardinalidades
  *   docs/img/modelo-er-atributos.svg  vista completa con atributos y claves
  */
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..');
+
+// El motor Graphviz NO viaja en este proyecto: es el que ya usa el Sprint 1 y se
+// toma prestado de su node_modules para no duplicar 20 MB ni descargar nada.
+// Los SVG y los PNG de docs/img ya están hechos, así que este guion sólo hace
+// falta si se cambia el modelo. Si el Sprint 1 no está al lado, se dice claro
+// en vez de reventar con un error de importación.
 const WASM = resolve(
     ROOT,
     '../../Projecte1-Sprint1/treball/node_modules/@hpcc-js/wasm/dist/graphviz.js'
 );
+
+if (!existsSync(WASM)) {
+    console.error(
+        'No encuentro el motor Graphviz del Sprint 1 en:\n  ' + WASM + '\n\n' +
+        'Este guion reutiliza el @hpcc-js/wasm de Projecte1-Sprint1/treball en vez\n' +
+        'de traer su propia copia. Para regenerar los diagramas hace falta el árbol\n' +
+        'completo del SSD, no sólo la carpeta tarraco-parkings.\n\n' +
+        'Los diagramas ya generados están en docs/img/ (modelo-er.svg y\n' +
+        'modelo-er-atributos.svg, con sus .png), así que la aplicación y la\n' +
+        'documentación funcionan sin ejecutar esto.'
+    );
+    process.exit(1);
+}
 
 const { Graphviz } = await import(pathToFileURL(WASM).href);
 
@@ -129,6 +148,7 @@ const ENTIDADES = [
             ['importe_total', 'DECIMAL(10,2)', 'NN'],
             ['importe_exceso', 'DECIMAL(10,2)', 'NN'],
             ['observaciones', 'VARCHAR(255)', ''],
+            ['condiciones_aceptadas', 'DATETIME', ''],
             ['fecha_creacion', 'DATETIME', 'NN'],
         ],
     },

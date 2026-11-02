@@ -89,16 +89,38 @@ tarraco-parkings/
 │   ├── prometheus/prometheus.yml
 │   └── grafana/provisioning/ + dashboards/
 ├── docs/
-│   ├── MODELO_LOGICO.md          el modelo completo, con relaciones y cardinalidades
-│   ├── DECISIONES-SPRINT2.md     por qué cada cosa es como es
+│   ├── MODELO_LOGICO.md              el modelo completo, con relaciones y cardinalidades
+│   ├── DECISIONES-SPRINT2.md         por qué cada cosa es como es
+│   ├── INCIDENCIAS.md                los problemas reales y cómo se resolvieron
 │   ├── MANUAL_TECNICO.md
-│   └── MANUAL_USUARIO.md
+│   ├── MANUAL_USUARIO.md
+│   ├── DOCUMENTO-PRESENTACION.pdf    el documento que acompaña a la presentación
+│   ├── PRESENTACION.pptx / .pdf      las 18 diapositivas
+│   └── VIDEO-DEMO.mp4                el recorrido grabado contra la aplicación
 ├── scripts/                      certificados, copia de seguridad, pruebas
 ├── tests/                        validador del esquema y cálculo de precios
-└── tools/gen-modelo.mjs          genera los diagramas E/R
+└── tools/                        diagramas E/R, presentación, vídeo, documento y ZIP
 ```
 
 ---
+
+## El paquete de entrega
+
+El ZIP se genera con un guion, no a mano, para que salga siempre igual y para
+que lo que no debe entregarse no se cuele:
+
+```bash
+python3 tools/empaqueta.py          # escribe ../tarraco-parkings-sprint2.zip
+```
+
+Dentro del ZIP todo cuelga de `tarraco-parkings/`, así que al descomprimirlo
+aparece una carpeta y no veinte archivos sueltos. Quedan fuera, a propósito:
+
+- **`.env`**, que lleva credenciales aunque sean de laboratorio. Se entrega
+  `.env.example`, que es la plantilla.
+- **Los certificados**, que el contenedor genera al arrancar.
+- **La caché de Python y las copias de `backups/`**, que son estado de una
+  máquina concreta.
 
 ## Cómo se comprueba
 
@@ -109,8 +131,15 @@ php tests/pricing_test.php          # 22 comprobaciones del cálculo económico
 php tests/check_sql_params.php      # marcadores SQL y parámetros cuadran
 python3 tests/check_schema.py       # 11 tablas, FKs e índices coherentes
 python3 tests/check_links.py        # enlaces y assets internos
+python3 tools/verifica-sintaxis.py  # estructura de los PHP, si no hay php -l
 node tools/gen-modelo.mjs           # regenera los diagramas del modelo
 ```
+
+`verifica-sintaxis.py` no sustituye a `php -l`: comprueba que paréntesis,
+corchetes y llaves cierran en orden y que no hay cadenas sin terminar, que es lo
+que sí se puede mirar sin intérprete. `gen-modelo.mjs` reutiliza el motor
+Graphviz del Sprint 1, así que necesita el árbol completo del SSD; los diagramas
+ya están en `docs/img/` y no hace falta ejecutarlo para arrancar la aplicación.
 
 Con Docker y el stack levantado:
 
@@ -128,11 +157,18 @@ reservas cuadran con su tarifa y que el trigger de borrado rechaza un `DELETE`.
 
 ## Criterios de aceptación
 
+Las filas marcadas «verificado» o «probado» se midieron en la pasada completa sobre la
+VM. Después de esa pasada se corrigieron cuatro cosas en el código
+(`access-control.php`, `reservation-pdf.php`, el solape de reservas por vehículo y la
+lectura de `business.*` en `config.php`), y **las dos suites se volvieron a ejecutar el
+29/10/2026 con la base recreada desde cero**: `smoke-test.sh` 19/19 y
+`e2e_client.py` 53/53. El detalle está en `docs/VERIFICACION-SPRINT2.md`, §4.1.
+
 | Criterio | Dónde está | Estado |
 |---|---|---|
-| `docker compose up -d` levanta todo | `docker-compose.yml` + `docker-compose.monitor.yml` | Verificado en la VM Ubuntu: 7 servicios, `smoke-test.sh` 18/18 |
+| `docker compose up -d` levanta todo | `docker-compose.yml` + `docker-compose.monitor.yml` | Verificado el 29/10/2026 en la VM: 7 servicios, `smoke-test.sh` 19/19 |
 | HTTPS con certificado autofirmado | `app/docker/apache-ssl.conf` + entrypoint | Verificado dentro de la VM |
-| Registro, login y vehículos | `register.php`, `login.php`, `vehicles.php` | Implementado y probado en la prueba e2e |
+| Registro, login y vehículos | `register.php`, `login.php`, `vehicles.php` | Probado en la e2e: 53/53 el 29/10/2026 |
 | Reserva con precio automático + 10 % | `reservation.php`, `src/Reservation.php` | Implementado, probado en cálculo y en la e2e |
 | Admin ve, modifica y cancela sin borrar | `admin/reservations.php` + triggers | Implementado; el trigger de borrado se prueba en el smoke test |
 | Simulación de entrada y salida | `access-control.php`, con sesión obligatoria | Implementado y probado en la e2e |
@@ -143,7 +179,7 @@ reservas cuadran con su tarifa y que el trigger de borrado rechaza un `DELETE`.
 | Gestión de plazas y tarifas | `admin/parkings.php` | Retirada y vuelta a servicio, y tarifas con vigencia |
 | Traza de auditoría consultable | `admin/audit.php` | Con filtros; la puede leer también el operador |
 | Código comentado y estructurado | `app/src/` | Hecho |
-| README y manuales | `README.md`, `docs/` | Hecho; 19 capturas reales en `docs/img/` |
+| README y manuales | `README.md`, `docs/` | Hecho; 22 capturas reales en `docs/img/`. Presentación, vídeo y documento de presentación incluidos |
 
 ---
 
@@ -155,7 +191,11 @@ reservas cuadran con su tarifa y que el trigger de borrado rechaza un `DELETE`.
 - [Manual técnico](docs/MANUAL_TECNICO.md): despliegue, operación, copias y diagnóstico.
 - [Manual de usuario](docs/MANUAL_USUARIO.md): los flujos de cliente y de administración.
 - [Guía para enseñarlo en vivo](docs/GUIA-DEMO.md): el recorrido de siete minutos, con las credenciales y lo que hay que decir en cada paso.
-- [Guion de la presentación](docs/PRESENTACION.md): las 15 diapositivas.
+- [Documento de presentación](docs/DOCUMENTO-PRESENTACION.pdf): 31 páginas con el alcance, la arquitectura, el modelo, el código, el Gantt, la verificación, la bibliografía y la declaración de IA.
+- [Presentación](docs/PRESENTACION.pptx) y [su PDF](docs/PRESENTACION.pdf): las 18 diapositivas, listas para proyectar.
+- [Guion de la presentación](docs/PRESENTACION.md): qué se dice en cada diapositiva.
+- [Vídeo de demostración](docs/VIDEO-DEMO.mp4): el recorrido completo contra la aplicación en marcha.
+- [Verificación del Sprint 2](docs/VERIFICACION-SPRINT2.md): qué se ejecutó el 28 y el 29/10/2026, qué devolvió y qué no se pudo comprobar.
 
 ---
 

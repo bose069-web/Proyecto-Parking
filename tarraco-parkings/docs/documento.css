@@ -1,0 +1,482 @@
+:root {
+  --navy: #1a4e89;
+  --navy-dark: #12365c;
+  --ink: #1a2332;
+  --muted: #5d6d7e;
+  --line: #d5dbe2;
+  --bg-soft: #f5f7fa;
+  --accent: #2e86c1;
+  --client: #1a4e89;
+  --admin: #6c3483;
+  --access: #117864;
+  --pay: #b9770e;
+}
+
+@page { size: A4; margin: 22mm 18mm 20mm 18mm; }
+/* Pagina apaisada para los diagramas que en vertical salen ilegibles: el
+   E/R completo con los atributos de las 12 tablas necesita los 265 mm de
+   ancho que da lahorizontal, y no los 174 mm del formato vertical. */
+@page apaisado { size: A4 landscape; margin: 14mm 16mm 16mm 16mm; }
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: "DejaVu Sans", "Liberation Sans", sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0;
+  padding: 0;
+  counter-reset: fig tab;
+}
+
+/* ---------- PORTADA ---------- */
+.cover {
+  height: 247mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+  border-top: 6mm solid var(--navy);
+  padding-top: 14mm;
+}
+.cover-institution {
+  font-size: 10pt;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.cover-institution strong { color: var(--navy); letter-spacing: .06em; }
+.cover h1 {
+  font-size: 27pt;
+  line-height: 1.22;
+  margin: 26mm 0 6mm;
+  color: var(--navy-dark);
+  font-weight: 700;
+}
+.cover h2 {
+  font-size: 13pt;
+  font-weight: 400;
+  color: var(--muted);
+  margin: 0 0 18mm;
+  line-height: 1.5;
+}
+.cover-rule { height: 2.4mm; background: var(--accent); width: 42%; margin: 0 0 14mm; }
+.cover-meta { display: flex; gap: 14mm; font-size: 10pt; }
+.cover-meta div { flex: 1; }
+.cover-meta dt {
+  font-size: 8pt; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--muted); margin: 0 0 1.5mm;
+}
+.cover-meta dd { margin: 0 0 5mm; font-weight: 600; }
+.cover-foot {
+  border-top: .4mm solid var(--line);
+  padding-top: 5mm;
+  font-size: 9pt;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ---------- ÍNDICE ---------- */
+.toc { page-break-after: always; }
+.toc h2 {
+  font-size: 17pt; color: var(--navy-dark);
+  border-bottom: .8mm solid var(--accent);
+  padding-bottom: 2.5mm; margin: 0 0 8mm;
+}
+.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
+.toc > ol > li { margin: 0 0 3.4mm; }
+.toc ol ol { margin: 1.5mm 0 0 8mm; }
+.toc li a {
+  text-decoration: none; color: var(--ink);
+  display: flex; align-items: baseline; gap: 2mm;
+}
+.toc li a::after {
+  content: ""; flex: 1;
+  border-bottom: .3mm dotted var(--muted);
+  transform: translateY(-1mm);
+}
+.toc > ol > li > a { font-weight: 600; font-size: 11pt; }
+.toc ol ol li a { font-size: 10pt; color: #34495e; }
+.toc .num {
+  display: inline-block; min-width: 9mm;
+  color: var(--navy); font-weight: 700;
+}
+
+/* ---------- ENCABEZADOS ---------- */
+h1.section {
+  font-size: 17pt; color: var(--navy-dark);
+  border-bottom: .8mm solid var(--accent);
+  padding-bottom: 2.5mm;
+  margin: 0 0 6mm;
+  page-break-before: always;
+}
+h1.section.nobreak { page-break-before: avoid; }
+h2 {
+  font-size: 12.5pt; color: var(--navy);
+  margin: 8mm 0 3mm;
+  padding-left: 3mm;
+  border-left: 1.2mm solid var(--accent);
+  page-break-after: avoid;
+}
+h3 {
+  font-size: 11pt; color: #34495e;
+  margin: 5.5mm 0 2mm;
+  page-break-after: avoid;
+}
+h4 { font-size: 10.5pt; color: var(--muted); margin: 4mm 0 1.5mm; page-break-after: avoid; }
+p { margin: 0 0 3mm; text-align: justify; }
+ul, ol { margin: 0 0 3mm; padding-left: 6mm; }
+li { margin-bottom: 1.2mm; }
+strong { color: #10233a; }
+code, .mono {
+  font-family: "DejaVu Sans Mono", monospace;
+  font-size: 9pt;
+  background: var(--bg-soft);
+  padding: .4mm 1mm;
+  border-radius: 1mm;
+}
+
+/* ---------- FIGURAS ---------- */
+figure {
+  margin: 5mm 0;
+  text-align: center;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+figure.er img, figure.us img { border: none; }
+/* Diagramas grandes: occupies the full width without leaving blank pages */
+figure.wide {
+  page-break-inside: avoid;
+  page-break-after: avoid;
+  margin: 0;
+}
+figure.wide img { width: 100%; max-height: 228mm; object-fit: contain; }
+figure.apaisado { page: apaisado; break-before: page; break-after: page; }
+/* 142 mm y no 172: la caja util de la pagina apaisada son 180 mm y el pie de
+   la figura 3.1 ocupa 33 mm. Con 148 mm el bloque entero medía 183 mm y el pie
+   se iba a una segunda pagina apaisada, dejando una hoja medio vacía. */
+figure.apaisado img { width: 100%; max-height: 142mm; object-fit: contain; }
+figure.wide figcaption { margin-top: 4mm; }
+/* Diagramas de casos de uso: sin limite de alto, casos_us_acceso mide 260 mm
+   y no cabe en los 255 mm del area de texto de A4, de modo que Chrome lo parte
+   entre dos paginas (el cuerpo en una y el pie en la siguiente). A 205 mm la
+   figura entra con su pie y deja de partirse. */
+figure.us img {
+  max-height: 205mm;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+/* Flujos: se limitan por alto para que no se corten entre paginas y
+   no se deformen. Van de uno en uno: en tres columnas el texto queda
+   ilegible en papel. El limite queda por debajo de los 255 mm del area de
+   texto para que la figura entre entera con su pie. */
+figure.flow img {
+  max-height: 200mm;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+/* Diagramas de hardware: son casi cuadrados, asi que sin limite de alto
+   secomerian la pagina entera. */
+figure.hw img {
+  max-height: 195mm;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+
+/* Listas densas (reglas de negocio): sin tanta separacion vertical */
+ul.dense, ul.dense li { margin-bottom: .3mm; }
+ul.dense { margin: 0 0 2.5mm; }
+h3 + ul.dense { margin-top: 0; }
+h3.tight { margin: 4mm 0 1.5mm; }
+
+/* Tabla compacta para listados largos (catalogo de casos, relaciones) */
+/* Tablas que pueden partirse entre paginas (listas largas). El thead se
+   repite automaticamente en la pagina de continuacion y ninguna fila se
+   parte por la mitad. Sin esto, una tabla de 9 filas deja medio pagina en
+   blanco porque no cabe entera y se va entera a la siguiente. */
+table.data.fluida,
+table.data.compact.fluida { page-break-inside: auto; }
+table.data tr { page-break-inside: avoid; break-inside: avoid; }
+table.data.compact { font-size: 8pt; }
+table.data.compact th { padding: 1.4mm 1.6mm; }
+table.data.compact td { padding: 1.2mm 1.6mm; }
+figcaption {
+  font-size: 9pt; color: var(--muted);
+  margin-top: 2mm; text-align: left;
+}
+figcaption b { color: var(--navy); }
+
+/* ---------- TABLAS ---------- */
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9pt;
+  margin: 4mm 0;
+  page-break-inside: avoid;
+}
+table.data th {
+  background: var(--navy);
+  color: #fff;
+  text-align: left;
+  padding: 2mm 2.2mm;
+  font-weight: 600;
+  border: .25mm solid var(--navy-dark);
+}
+table.data td {
+  padding: 1.8mm 2.2mm;
+  border: .25mm solid var(--line);
+  vertical-align: top;
+}
+table.data tbody tr:nth-child(even) { background: #f8fafc; }
+table.data td.pk { color: #b03a2e; font-weight: 700; }
+table.data td.fk { color: #7d3c98; font-weight: 600; }
+table.data td.uq { color: #b9770e; font-weight: 600; }
+table.data td.nn { color: #5d6d7e; font-weight: 600; }
+table.data td.num, table.data th.num { text-align: center; width: 9mm; }
+
+/* ---------- CAJAS ---------- */
+.note {
+  border-left: 1.2mm solid var(--accent);
+  background: #f0f6fc;
+  padding: 3mm 4mm;
+  margin: 4mm 0;
+  font-size: 9.5pt;
+  page-break-inside: avoid;
+}
+.note.warn { border-left-color: #b9770e; background: #fdf6e9; }
+.note.info { border-left-color: var(--muted); background: #f2f4f6; }
+.note b { color: var(--navy-dark); }
+.note.warn b { color: #7e5109; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 3mm 6mm; margin: 3mm 0; font-size: 9pt; }
+.legend span { display: flex; align-items: center; gap: 1.5mm; }
+.legend i { width: 5mm; height: 3mm; border-radius: .6mm; display: inline-block; }
+
+/* ---------- ACTORES ---------- */
+.actor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4mm;
+  margin: 4mm 0;
+  page-break-inside: avoid;
+}
+.actor-card.admin { border-top-color: var(--admin); }
+.actor-card.access { border-top-color: var(--access); }
+.actor-card.pay { border-top-color: var(--pay); }
+.actor-card h4 { margin: 0 0 1.5mm; font-size: 10pt; color: var(--ink); }
+.actor-card p { margin: 0; text-align: left; }
+
+/* ---------- GANTT ---------- */
+table.gantt {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8.5pt;
+  margin: 4mm 0;
+}
+table.gantt th {
+  background: var(--navy); color: #fff;
+  padding: 1.6mm; text-align: left;
+  font-size: 8.5pt; border: .25mm solid var(--navy-dark);
+}
+table.gantt th.chart { padding: 0; }
+table.gantt .weeks { display: grid; grid-template-columns: repeat(5, 1fr); }
+table.gantt .weeks span {
+  padding: 1.6mm .5mm; text-align: center;
+  border-right: .25mm solid var(--navy-dark);
+  font-weight: 400;
+}
+table.gantt .weeks span:last-child { border-right: none; }
+table.gantt td { padding: 1.3mm 1.6mm; border-bottom: .2mm solid var(--line); vertical-align: middle; }
+table.gantt td.num { color: var(--navy); font-weight: 700; width: 8mm; text-align: center; }
+table.gantt td.name { width: 52%; }
+table.gantt td.prio { width: 10mm; text-align: center; color: var(--muted); }
+table.gantt td.role { width: 12mm; text-align: center; }
+table.gantt tr.group td { background: #eef2f7; font-weight: 600; }
+table.gantt tr.task td { background: #fff; }
+table.gantt tr.task:hover td { background: #f8fafc; }
+table.gantt td.chart {
+  position: relative;
+  height: 7mm;
+  padding: 0;
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent 0, transparent 19.9%,
+    #e2e8f0 19.9%, #e2e8f0 20%
+  );
+}
+table.gantt .bar {
+  position: absolute; top: 1.4mm; height: 4.2mm;
+  border-radius: 1mm;
+}
+table.gantt .chip {
+  display: inline-block;
+  color: #fff; font-size: 7.5pt; font-weight: 700;
+  padding: .3mm 1.4mm; border-radius: .8mm;
+}
+.phase {
+  font-size: 7.5pt; color: var(--muted); font-weight: 400;
+  font-style: italic; margin-left: 1.5mm;
+}
+
+/* ---------- TABLA DE TAREAS ---------- */
+.prio-p1 { border-left: 1mm solid #c0392b; }
+.prio-p2 { border-left: 1mm solid #d68910; }
+.prio-p3 { border-left: 1mm solid #7f8c8d; }
+tr.prio-p1 td:first-child { border-left: 1mm solid #c0392b; }
+tr.prio-p2 td:first-child { border-left: 1mm solid #d68910; }
+tr.prio-p3 td:first-child { border-left: 1mm solid #7f8c8d; }
+
+/* ---------- MÁQUINA DE ESTADOS ---------- */
+.sm {
+  width: 100%; border-collapse: collapse; font-size: 8.5pt;
+  margin: 4mm 0; text-align: center;
+}
+.sm th { background: var(--navy); color: #fff; padding: 1.8mm; border: .25mm solid var(--navy-dark); }
+.sm td { padding: 1.6mm; border: .25mm solid var(--line); }
+.sm td.from { background: var(--bg-soft); font-weight: 600; text-align: left; }
+.sm td.to { font-weight: 600; color: var(--navy); }
+.sm td.ev { font-size: 8pt; color: var(--muted); }
+.sm tr:nth-child(even) td { background: #f8fafc; }
+
+/* ---------- FIRMAS ---------- */
+.signs { display: flex; gap: 12mm; margin-top: 14mm; page-break-inside: avoid; }
+.signs div { flex: 1; text-align: center; font-size: 9pt; }
+.signs .line { border-top: .3mm solid var(--ink); margin-bottom: 2mm; padding-top: 1.5mm; }
+.signs .name { font-weight: 600; }
+
+/* ---------- CRÉDITOS IA ---------- */
+.credits td { font-size: 8.5pt; }
+
+.actor-card {
+  border: .35mm solid var(--line);
+  border-top: 1.4mm solid var(--client);
+  border-radius: 0 0 1.5mm 1.5mm;
+  padding: 3mm 3.4mm;
+  font-size: 9pt;
+}
+
+/* =====================================================================
+   Añadidos del documento de presentación del Sprint 2
+   ===================================================================== */
+
+/* Índice con número de página real. El número lo escribe la segunda pasada
+   del generador; si queda el guion bajo es que la entrada no se encontró.
+   Va posicionado a la derecha para que quede sobre la línea de puntos y no
+   empuje el título: como elemento flex, el número se colocaba detrás del
+   texto y la línea de puntos quedaba detrás de él. */
+.toc li a { position: relative; padding-right: 11mm; }
+.toc li a .pg {
+  position: absolute; right: 0; bottom: 0;
+  color: var(--navy); font-weight: 700;
+  background: #fff; padding-left: 1.6mm;
+  min-width: 8mm; text-align: right;
+}
+
+/* Código con líneas numeradas: los extractos del documento se citan por
+   fichero y por línea, y sin números la cita no se puede seguir. */
+pre.code {
+  font-family: "DejaVu Sans Mono", monospace;
+  font-size: 7.8pt;
+  line-height: 1.42;
+  background: #f7f9fb;
+  border: .25mm solid var(--line);
+  border-left: 1.2mm solid var(--navy);
+  padding: 2.5mm 3mm;
+  margin: 3mm 0 4mm;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  page-break-inside: avoid;
+}
+pre.code .c { color: #6b7c8d; font-style: italic; }
+pre.code .k { color: #7d3c98; font-weight: 600; }
+pre.code .s { color: #1e7a5a; }
+pre.code cite {
+  display: block; font-style: normal; font-size: 7.4pt; color: var(--muted);
+  margin-top: 1.5mm; border-top: .2mm solid var(--line); padding-top: 1.2mm;
+}
+
+/* Rejilla de capturas: dos por fila, con su pie corto debajo. */
+.shots { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm 5mm; margin: 4mm 0; }
+.shots figure { margin: 0; }
+.shots img { width: 100%; border: .25mm solid var(--line); }
+.shots figcaption { font-size: 8pt; }
+.shots .ancha { grid-column: 1 / -1; }
+.shots .ancha img { width: 100%; max-height: 150mm; object-fit: contain; }
+
+/* Ficha de dato: parejas etiqueta/valor en dos columnas. */
+dl.ficha { display: grid; grid-template-columns: 42mm 1fr; gap: 1.6mm 4mm; margin: 3mm 0; font-size: 9.5pt; }
+dl.ficha dt { color: var(--muted); }
+dl.ficha dd { margin: 0; font-weight: 600; }
+
+/* Tabla de criterios: la columna del veredicto es la que se mira. */
+td.ok { color: #1e7a4f; font-weight: 700; white-space: nowrap; }
+td.parcial { color: #9a6a10; font-weight: 700; white-space: nowrap; }
+td.falta { color: #a93226; font-weight: 700; white-space: nowrap; }
+
+/* El Gantt del Sprint 2 tiene siete semanas, no cinco. La rejilla de la
+   cabecera y las líneas de fondo se recalculan, o las barras no caen debajo
+   de su semana. */
+table.gantt .weeks { grid-template-columns: repeat(7, 1fr); }
+table.gantt td.chart {
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent 0, transparent 14.1%,
+    #e2e8f0 14.1%, #e2e8f0 14.2857%
+  );
+}
+table.gantt th.chart { padding: 0; vertical-align: middle; }
+
+/* El Gantt tiene diecinueve filas y no cabía en la página que empieza en 6.3:
+   se partía dejando dos filas sueltas en la hoja siguiente. Se aprieta el
+   interlineado —no el contenido— para que entre entero con su leyenda. */
+table.gantt { font-size: 7.9pt; margin: 3mm 0; }
+table.gantt th { padding: 1.1mm 1.4mm; font-size: 7.9pt; }
+table.gantt .weeks span { padding: 1.1mm .4mm; }
+table.gantt td { padding: .7mm 1.4mm; }
+table.gantt td.chart { height: 5.4mm; }
+table.gantt .bar { top: 1mm; height: 3.4mm; }
+
+/* El índice del Sprint 1 cabía en una página con 30 entradas. Este tiene 51,
+   y con los márgenes de allí se iba a una segunda hoja con cinco líneas
+   sueltas. Se aprieta el interlineado y el tamaño, no el contenido. */
+.toc h2 { margin-bottom: 6mm; }
+.toc > ol > li { margin-bottom: 2.1mm; }
+.toc ol ol { margin: 1mm 0 0 7mm; }
+.toc > ol > li > a { font-size: 10.2pt; }
+.toc ol ol li a { font-size: 9.2pt; }
+.toc li a { line-height: 1.25; }
+
+/* Galería del anexo: tres columnas para que las catorce capturas entren en una
+   página. En dos columnas la última fila se quedaba sola en una hoja. */
+.shots.tres { grid-template-columns: repeat(3, 1fr); gap: 3mm 4mm; }
+.shots.tres figcaption { font-size: 7.6pt; line-height: 1.3; }
+
+/* Ajuste fino de paginación: con el interlineado del Sprint 1, cinco secciones
+   dejaban una página final con dos o tres líneas sueltas. Se aprieta un poco
+   el ritmo vertical (no el tamaño de la letra) para que cada sección cierre
+   donde debe. */
+body { line-height: 1.5; }
+p { margin-bottom: 2.7mm; }
+ul li, ol li { margin-bottom: 0.9mm; }
+.shots.tres img { max-height: 31mm; object-fit: contain; }
+h2 { margin-top: 6.5mm; }
+
+/* Un bloque corto que no debe partirse: si no cabe al final de la hoja, pasa
+   entero a la siguiente. Se usa en 7.3, que dejaba un solo punto suelto. */
+.keep { break-inside: avoid; }
+h2 { break-after: avoid; }

@@ -14,6 +14,21 @@ final class AccessControl
     private const MARGEN_SALIDA  = 15; // minutos de gracia al salir
 
     /**
+     * Los dos márgenes están en config.php (`business.margen_entrada` y
+     * `business.margen_salida`) y las constantes son el valor por defecto.
+     * Se acotan para que un valor absurdo no deje el simulador inservible.
+     */
+    private static function margenEntrada(): int
+    {
+        return max(0, min(240, (int) app_config('business.margen_entrada', self::MARGEN_ENTRADA)));
+    }
+
+    private static function margenSalida(): int
+    {
+        return max(0, min(240, (int) app_config('business.margen_salida', self::MARGEN_SALIDA)));
+    }
+
+    /**
      * @return array{ok:bool, mensaje:string, reserva:?array, exceso:?array}
      */
     public static function entrada(int $idParking, string $matricula, ?int $soloCliente = null): array
@@ -81,7 +96,7 @@ final class AccessControl
                     $motivo = 'La reserva existe pero el pago no está confirmado.';
                 } elseif ($futura !== null) {
                     $desde = date('H:i', strtotime($futura['fecha_hora_entrada_prevista'])
-                        - self::MARGEN_ENTRADA * 60);
+                        - self::margenEntrada() * 60);
                     $motivo = sprintf(
                         'Tu reserva empieza a las %s; podrás entrar a partir de las %s.',
                         date('H:i', strtotime($futura['fecha_hora_entrada_prevista'])),
@@ -211,7 +226,7 @@ final class AccessControl
                 (float) $reserva['precio_hora'],
                 (string) $reserva['fecha_hora_salida_prevista'],
                 $ahora,
-                self::MARGEN_SALIDA
+                self::margenSalida()
             );
 
             $estado = $exceso['importe'] > 0 ? 'CON_EXCESO' : 'FINALIZADA';
@@ -303,7 +318,7 @@ final class AccessControl
 
     private static function reservaParaEntrada(PDO $pdo, int $idVehiculo, int $idParking): ?array
     {
-        $margen = self::MARGEN_ENTRADA;
+        $margen = self::margenEntrada();
 
         $sql = "SELECT r.*, pl.codigo_plaza, t.precio_hora
                   FROM RESERVA r
@@ -348,10 +363,10 @@ final class AccessControl
      */
     private static function reservaFutura(PDO $pdo, int $idVehiculo, int $idParking): ?array
     {
-        // El margen es una constante entera de la clase, no un dato del usuario:
-        // se interpola como en reservaParaEntrada() para que la consulta no
-        // lleve un marcador que no aporta nada.
-        $margen = self::MARGEN_ENTRADA;
+        // El margen es un entero acotado de la configuración, no un dato del
+        // usuario: se interpola como en reservaParaEntrada() para que la consulta
+        // no lleve un marcador que no aporta nada.
+        $margen = self::margenEntrada();
 
         $stmt = $pdo->prepare(
             "SELECT * FROM RESERVA

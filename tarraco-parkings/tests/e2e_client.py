@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """Prueba de extremo a extremo del lado cliente contra el stack real.
 
-Se ejecuta desde el amfitrió i parla amb la VM pel port reenviat 8443. Per tant
-el client és el portàtil i el servidor és la VM: dos màquines distintes, que és
-el que es volia demostrar.
+Se ejecuta desde el anfitrión y habla con la VM por el puerto reenviado 8443.
+El cliente es el portátil y el servidor es la máquina virtual: dos máquinas
+distintas, que es lo que se quería demostrar.
 
-Recorre el flux complet d'un client: registre, login, reserva amb càlcul de
-preu, consulta, entrada i eixida pel control d'accés. I després el panell
-d'administració.
+Recorre el flujo completo de un cliente: registro, login, reserva con cálculo
+de precio, resguardo PDF, consulta, entrada y salida por el control de acceso.
+Después, el panel de administración.
 
-Ús:
+Uso:
     PYTHONPATH=Maquinas/_pylib python3 tarraco-parkings/tests/e2e_client.py
     ... --host https://127.0.0.1:8443
 """
@@ -197,10 +197,19 @@ def main() -> int:
     entrada = (datetime.now() + timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M")
     salida = (datetime.now() + timedelta(hours=4)).strftime("%Y-%m-%dT%H:%M")
 
+    # Aceptar las condiciones es obligatorio. Sin la casilla no debe crearse nada.
+    r = s.post(base + "/reservation.php",
+               data={"id_parking": 1, "id_vehiculo": id_vehiculo,
+                     "entrada": entrada, "salida": salida, "_csrf": token},
+               timeout=20)
+    check("la reserva se rechaza si no se aceptan las condiciones",
+          "condiciones" in r.text.lower() and "TR-" not in r.text)
+
     r = s.post(base + "/reservation.php",
                data={"id_parking": 1, "id_vehiculo": id_vehiculo,
                      "entrada": entrada, "salida": salida,
-                     "observaciones": "Reserva de la prueba e2e", "_csrf": token},
+                     "observaciones": "Reserva de la prueba e2e",
+                     "condiciones": "1", "_csrf": token},
                timeout=20)
     check("la reserva se crea", r.status_code == 200, f"rebut {r.status_code}")
 
@@ -222,6 +231,15 @@ def main() -> int:
     # Identificador interno para comprobar después el aislamiento entre clientes.
     m = re.search(r"/reservation\.php\?id=(\d+)", r.text)
     id_reserva = m.group(1) if m else None
+
+    # El resguardo PDF es lo que se enseña en el acceso al parking.
+    if id_reserva:
+        r = s.get(base + f"/reservation-pdf.php?id={id_reserva}", timeout=20)
+        check("el resguardo de la reserva se descarga en PDF",
+              r.status_code == 200 and r.content[:5] == b"%PDF-",
+              f"rebut {r.status_code}, {r.headers.get('Content-Type')}")
+        check("el PDF lleva el código de reserva",
+              codigo is not None and codigo.encode() in r.content)
 
     # ------------------------------------------------------- 4. acceso entrada
     print("\n4. Control de acceso (entrada y salida)")

@@ -84,6 +84,14 @@ excesos=$(q "SELECT COUNT(*) FROM RESERVA
  WHERE fecha_hora_salida_real > fecha_hora_salida_prevista + INTERVAL 15 MINUTE AND importe_exceso = 0;")
 [[ "$excesos" == "0" ]] && ok "ninguna salida tardía se quedó sin cobrar el exceso" || fallo "$excesos salidas tardías sin exceso"
 
+# El cobro de la reserva tiene que ser el total congelado en RESERVA. Sin esta
+# comprobación, un importe duplicado en PAGO pasa inadvertido: los totales de
+# RESERVA cuadran igual y el error solo se ve sumando los ingresos.
+pagos=$(q "SELECT COUNT(*) FROM PAGO p JOIN RESERVA r ON r.id_reserva=p.id_reserva
+ WHERE p.tipo_pago='RESERVA' AND p.estado='CONFIRMADO'
+   AND ABS(p.importe - r.importe_total) > 0.01;")
+[[ "$pagos" == "0" ]] && ok "cada cobro de reserva coincide con su importe total" || fallo "$pagos pagos no coinciden con el total de su reserva"
+
 borrado=$(docker compose exec -T db mariadb -u root -p"$DB_ROOT_PASSWORD" "$DB_NAME" -e "START TRANSACTION; DELETE FROM RESERVA WHERE id_reserva = 1; ROLLBACK;" 2>&1)
 if grep -qi "no se borran" <<<"$borrado"; then
     ok "el trigger impide borrar una reserva"

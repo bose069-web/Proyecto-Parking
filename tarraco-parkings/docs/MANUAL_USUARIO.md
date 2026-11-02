@@ -93,7 +93,8 @@ sus reservas antiguas se conservan.
 4. Indica la entrada y la salida. Por defecto se propone dentro de una hora,
    para tres horas.
 5. A la derecha aparece el precio calculado en tiempo real.
-6. Pulsa **Confirmar y pagar**.
+6. Marca la casilla de condiciones, que enlaza al texto completo.
+7. Pulsa **Confirmar y pagar**.
 
 La aplicación asigna la primera plaza libre compatible con el tipo de vehículo.
 El pago se confirma en el acto y la reserva pasa a **ACTIVA**. Si no queda
@@ -156,9 +157,9 @@ minutos después de la hora prevista, se cobra un exceso por horas completas o
 fracción, sin el 10 % de gestión. La reserva pasa a **CON_EXCESO** y el cobro
 queda como un pago aparte.
 
-Ejemplo: salida prevista a las 12:00, salida real a las 14:20. Con 15 minutos
+Ejemplo: salida prevista a las 12:00, salida real a las 14:00. Con 15 minutos
 de gracia son 105 minutos, es decir, 2 horas de exceso. A 1,20 €/h se cobran
-2,40 €.
+2,40 €. A las 14:20 serían 125 minutos y 3 horas, o sea 3,60 €.
 
 Cada intento, autorizado o no, queda registrado con su motivo. Si la matrícula
 no existe, también.
@@ -269,8 +270,10 @@ El operador también puede consultarla, aunque no pueda modificar nada.
 No. La entrada debe ser futura, con 5 minutos de margen técnico.
 
 **¿Puedo reservar dos plazas a la vez?**
-Sí, si son franjas distintas o parkings distintos. La misma plaza no se asigna
-dos veces en la misma franja.
+Con la misma matrícula, no: un vehículo no puede tener dos reservas vivas en
+franjas que se solapen, aunque sean parkings distintos. Al llegar solo podría
+entrar con una y la otra se quedaría pagada y sin usar. Con vehículos
+distintos sí, y la misma plaza tampoco se asigna dos veces en la misma franja.
 
 **¿Qué pasa si llego tarde?**
 Tienes 30 minutos de margen para entrar. Pasado ese tiempo, la reserva puede
@@ -297,14 +300,15 @@ fuera de servicio.
 ## 7. Capturas para la entrega
 
 Las capturas son reales, hechas sobre la aplicación en marcha en la VM. No se
-fabrican. Las diecinueve están en `docs/img/` con el nombre
+fabrican. Las veintidós están en `docs/img/` con el nombre
 `captura-NN-descripcion.png`, y cada una se ha revisado contra la imagen.
 
-Todas se tomaron el 23/10/2026 con el mismo procedimiento: Chrome dentro de la
-VM, el framebuffer capturado con `VBoxManage controlvm screenshotpng`. Las del
-panorama de cliente son las mismas escenas que ya existían, rehechas después de
-los cambios de color y de texto, para que el documento y la aplicación no se
-contradigan.
+Todas se tomaron con el mismo procedimiento: Chrome dentro de la VM, el framebuffer
+capturado con `VBoxManage controlvm screenshotpng`. Las diecinueve primeras son del
+23/10/2026; las tres últimas —condiciones, formulario de condiciones y resguardo
+PDF— son del 28/10, cuando se añadieron esas tres pantallas. Las del panorama de
+cliente son las mismas escenas que ya existían, rehechas después de los cambios de
+color y de texto, para que el documento y la aplicación no se contradigan.
 
 | # | Qué enseña | Archivo |
 |---|---|---|
@@ -327,6 +331,9 @@ contradigan.
 | 17 | Ficha de parking con sus plazas y sus tarifas | `captura-17-admin-parkings.png` |
 | 18 | Traza de auditoría con filtros y detalle | `captura-18-auditoria.png` |
 | 19 | Perfil del cliente con el método de pago | `captura-19-perfil.png` |
+| 20 | Condiciones de la reserva, las seis cláusulas | `captura-20-condiciones.png` |
+| 21 | Formulario de reserva con la casilla de condiciones marcada | `captura-21-formulario-condiciones.png` |
+| 22 | Resguardo de la reserva en PDF | `captura-22-resguardo-pdf.png` |
 
 La captura 14 se tomó con el panel aprovisionado y datos reales de la
 aplicación. La 15 demuestra que Prometheus recoge de los cuatro objetivos:

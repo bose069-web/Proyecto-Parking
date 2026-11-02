@@ -93,6 +93,8 @@ render_header('Mis reservas', 'reservas');
                         <td><span class="badge badge-<?= e($r['estado']) ?>"><?= e(etiqueta_estado($r['estado'])) ?></span></td>
                         <td class="num">
                             <a class="btn btn-ghost btn-small" href="/reservation.php?id=<?= (int) $r['id_reserva'] ?>">Ver</a>
+                            <a class="btn btn-ghost btn-small" href="/reservation-pdf.php?id=<?= (int) $r['id_reserva'] ?>"
+                               target="_blank" rel="noopener" title="Resguardo en PDF">PDF</a>
                             <?php if ($cancelable): ?>
                                 <form method="post" action="/my-reservations.php" class="inline-form"
                                       data-confirm="¿Cancelar la reserva <?= e($r['codigo_reserva']) ?>?">

@@ -251,14 +251,15 @@ tarjeta, solo una referencia. La estructura de `PAGO` sí es la real: tipo,
 importe, estado y referencia de transacción.
 
 **¿Cuántas pruebas tenéis?**
-Cincuenta automáticas de extremo a extremo contra la aplicación en marcha,
-dieciocho de humo dentro de la máquina, veintidós del cálculo de precios, y la
+Cincuenta y tres automáticas de extremo a extremo contra la aplicación en marcha,
+diecinueve de humo dentro de la máquina, veintidós del cálculo de precios, y la
 validación del esquema y de las consultas. Y la prueba de extremo a extremo crea
 su propia cuenta y su propio parking para poder repetirse.
 
 **¿Esto lo ha hecho una IA?**
-Sí, con dirección y revisión. Está explicado en el apartado de uso de IA del
-documento de presentación, y las decisiones están en `DECISIONES-SPRINT2.md`.
+Sí, con dirección y revisión. El apartado 9 del documento de presentación lleva
+la tabla «fase / quién», el nombre del agente y del modelo y los cinco prompts
+usados; las decisiones están en `DECISIONES-SPRINT2.md`.
 
 ---
 
